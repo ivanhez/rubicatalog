@@ -25,10 +25,26 @@ const AdminProductForm = () => {
     }
   };
 
+  // Manejar cambios en los inputs de texto
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // Manejar la carga de archivo (imagen)
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Convertir archivo a base64
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      const base64String = evt.target.result.split(",")[1];
+      setForm({ ...form, foto: base64String });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Crear nuevo producto
   const handleCreate = async (e) => {
     e.preventDefault();
     try {
@@ -54,6 +70,7 @@ const AdminProductForm = () => {
     }
   };
 
+  // Seleccionar producto para edición
   const handleSelectProduct = (prod) => {
     setForm({
       id: prod.id,
@@ -61,10 +78,11 @@ const AdminProductForm = () => {
       talla: prod.talla,
       colores: prod.colores,
       precio: prod.precio,
-      foto: prod.foto,
+      foto: prod.foto, // base64
     });
   };
 
+  // Actualizar producto
   const handleUpdate = async () => {
     try {
       await axios.put(`http://localhost:4000/api/productos/${form.id}`, {
@@ -89,6 +107,7 @@ const AdminProductForm = () => {
     }
   };
 
+  // Eliminar producto
   const handleDelete = async (id) => {
     try {
       await axios.delete(`http://localhost:4000/api/productos/${id}`);
@@ -103,50 +122,71 @@ const AdminProductForm = () => {
     <div>
       <h2>Administrar Productos</h2>
       <form onSubmit={handleCreate} style={{ marginBottom: "1rem" }}>
-        <input
-          type="text"
-          name="descripcion"
-          placeholder="Descripción"
-          value={form.descripcion}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="text"
-          name="talla"
-          placeholder="Talla"
-          value={form.talla}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="colores"
-          placeholder="Colores"
-          value={form.colores}
-          onChange={handleChange}
-        />
-        <input
-          type="number"
-          name="precio"
-          placeholder="Precio"
-          value={form.precio}
-          onChange={handleChange}
-          required
-        />
-        <input
-          type="text"
-          name="foto"
-          placeholder="URL de la foto"
-          value={form.foto}
-          onChange={handleChange}
-        />
-        <button type="submit">Crear Producto</button>
-
-        {form.id && (
-          <button type="button" onClick={handleUpdate}>
-            Actualizar Producto
-          </button>
-        )}
+        <div>
+          <label>Descripción:</label>
+          <input
+            type="text"
+            name="descripcion"
+            value={form.descripcion}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div>
+          <label>Talla:</label>
+          <input
+            type="text"
+            name="talla"
+            value={form.talla}
+            onChange={handleChange}
+          />
+        </div>
+        <div>
+          <label>Colores:</label>
+          <input
+            type="text"
+            name="colores"
+            value={form.colores}
+            onChange={handleChange}
+          />
+        </div>
+        <div>
+          <label>Precio:</label>
+          <input
+            type="number"
+            name="precio"
+            value={form.precio}
+            onChange={handleChange}
+            step="0.01"
+            required
+          />
+        </div>
+        <div>
+          <label>Imagen (base64):</label>
+          <input type="file" accept="image/*" onChange={handleFileChange} />
+          {/* Si deseas ver un preview de la imagen base64 */}
+          {form.foto && (
+            <div style={{ marginTop: "1rem" }}>
+              <img
+                src={`data:image/png;base64,${form.foto}`}
+                alt="preview"
+                style={{ width: 100, height: 100, objectFit: "cover" }}
+              />
+            </div>
+          )}
+        </div>
+        <div style={{ marginTop: "1rem" }}>
+          <button type="submit">Crear Producto</button>
+          {form.id && (
+            <button
+              type="button"
+              onClick={handleUpdate}
+              style={{ marginLeft: "1rem" }}
+            >
+              Actualizar Producto
+            </button>
+          )}
+        </div>
       </form>
 
       <table
@@ -161,7 +201,7 @@ const AdminProductForm = () => {
             <th>Talla</th>
             <th>Colores</th>
             <th>Precio</th>
-            <th>Foto</th>
+            <th>Foto (base64)</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -176,9 +216,13 @@ const AdminProductForm = () => {
               <td>
                 {prod.foto && (
                   <img
-                    src={prod.foto}
+                    src={`data:image/png;base64,${prod.foto}`}
                     alt={prod.descripcion}
-                    style={{ height: "50px" }}
+                    style={{
+                      width: "80px",
+                      height: "80px",
+                      objectFit: "cover",
+                    }}
                   />
                 )}
               </td>
@@ -186,7 +230,12 @@ const AdminProductForm = () => {
                 <button onClick={() => handleSelectProduct(prod)}>
                   Editar
                 </button>
-                <button onClick={() => handleDelete(prod.id)}>Eliminar</button>
+                <button
+                  onClick={() => handleDelete(prod.id)}
+                  style={{ marginLeft: "0.5rem" }}
+                >
+                  Eliminar
+                </button>
               </td>
             </tr>
           ))}

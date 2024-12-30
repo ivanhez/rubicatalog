@@ -9,24 +9,12 @@ export const getAllProducts = async (req, res) => {
   }
 };
 
-export const getProductById = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const [rows] = await pool.query("SELECT * FROM productos WHERE id = ?", [
-      id,
-    ]);
-    if (rows.length === 0) {
-      return res.status(404).json({ message: "Producto no encontrado" });
-    }
-    res.json(rows[0]);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
 export const createProduct = async (req, res) => {
   try {
     const { descripcion, talla, colores, precio, foto } = req.body;
+    /*
+      foto => será una string base64 que viene desde el frontend
+    */
     const [result] = await pool.query(
       "INSERT INTO productos (descripcion, talla, colores, precio, foto) VALUES (?, ?, ?, ?, ?)",
       [descripcion, talla, colores, precio, foto]

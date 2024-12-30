@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const ProductList = () => {
+const ProductList = ({ onAddToCart }) => {
   const [productos, setProductos] = useState([]);
 
   useEffect(() => {
@@ -37,17 +37,25 @@ const ProductList = () => {
               textAlign: "center",
             }}
           >
+            {/* Renderizar imagen base64 */}
             {prod.foto && (
               <img
-                src={prod.foto}
+                src={`data:image/png;base64,${prod.foto}`}
                 alt={prod.descripcion}
-                style={{ maxWidth: "100%" }}
+                style={{
+                  maxWidth: "100px",
+                  maxHeight: "100px",
+                  objectFit: "cover",
+                }}
               />
             )}
             <h3>{prod.descripcion}</h3>
             <p>Talla: {prod.talla}</p>
             <p>Colores: {prod.colores}</p>
             <p>Precio: ${prod.precio}</p>
+            <button onClick={() => onAddToCart(prod)}>
+              Agregar al carrito
+            </button>
           </div>
         ))}
       </div>

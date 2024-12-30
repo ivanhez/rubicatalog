@@ -3,16 +3,9 @@ import { pool } from "../config/db.js";
 export const createOrder = async (req, res) => {
   try {
     const { productos } = req.body;
-    /*
-      productos es un array de objetos:
-      [
-        { id: 1, cantidad: 2 },
-        { id: 4, cantidad: 1 },
-        ...
-      ]
-    */
+    // productos => [{ id: 1, cantidad: 2 }, { id:2, cantidad:3 }, ...]
 
-    // 1. Crear registro en tabla pedidos
+    // 1. Crear registro en la tabla 'pedidos'
     const [orderResult] = await pool.query(
       "INSERT INTO pedidos (estado) VALUES (?)",
       ["pendiente"]
@@ -21,10 +14,9 @@ export const createOrder = async (req, res) => {
 
     let total = 0;
 
-    // 2. Insertar detalles en pedidos_detalles
+    // 2. Insertar detalles en 'pedidos_detalles'
     for (let producto of productos) {
       const { id, cantidad } = producto;
-
       // Obtener precio del producto
       const [rows] = await pool.query(
         "SELECT precio FROM productos WHERE id=?",
@@ -40,7 +32,7 @@ export const createOrder = async (req, res) => {
       );
     }
 
-    // 3. Actualizar total en la tabla pedidos
+    // 3. Actualizar el total en la tabla 'pedidos'
     await pool.query("UPDATE pedidos SET total=? WHERE id=?", [
       total,
       pedidoId,
@@ -48,7 +40,7 @@ export const createOrder = async (req, res) => {
 
     res.json({ message: "Pedido creado correctamente", pedidoId, total });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ error: error.message });
   }
 };
