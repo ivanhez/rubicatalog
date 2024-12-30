@@ -75,40 +75,43 @@ function App() {
   return (
     <div className="container">
       <header className="header">
-        <h1>Mi Tienda E-commerce</h1>
+        <div className="header__logo">
+          <h1>Rubi Seduction</h1>
+        </div>
+        <nav className="header__nav">
+          <button onClick={() => setView("catalogo")}>Catálogo</button>
+          <button onClick={() => setView("carrito")}>
+            Carrito ({cart.length})
+          </button>
+          {!isAdminLogged ? (
+            <button onClick={() => setView("login")}>Admin Login</button>
+          ) : (
+            <>
+              <button onClick={() => setView("admin")}>Administración</button>
+              <button onClick={handleLogout}>Cerrar Sesión</button>
+            </>
+          )}
+        </nav>
       </header>
 
-      <nav className="nav">
-        <button onClick={() => setView("catalogo")}>Ver Catálogo</button>
-        <button onClick={() => setView("carrito")}>
-          Carrito ({cart.length})
-        </button>
-        {!isAdminLogged ? (
-          <button onClick={() => setView("login")}>Admin Login</button>
-        ) : (
-          <>
-            <button onClick={() => setView("admin")}>Administración</button>
-            <button onClick={handleLogout}>Cerrar Sesión</button>
-          </>
+      <div className="main-content">
+        {view === "catalogo" && (
+          <ProductList
+            onSelectProduct={handleSelectProduct}
+            onAddToCart={onAddToCart}
+          />
         )}
-      </nav>
-
-      {view === "catalogo" && (
-        <ProductList
-          onSelectProduct={handleSelectProduct}
-          onAddToCart={onAddToCart}
-        />
-      )}
-      {view === "detalle" && (
-        <ProductDetail
-          productId={selectedProductId}
-          onAddToCart={onAddToCart}
-          goBack={handleGoBack}
-        />
-      )}
-      {view === "carrito" && <OrderCart cart={cart} setCart={setCart} />}
-      {view === "login" && <Login onLogin={handleLogin} />}
-      {view === "admin" && isAdminLogged && <AdminProductForm />}
+        {view === "detalle" && (
+          <ProductDetail
+            productId={selectedProductId}
+            onAddToCart={onAddToCart}
+            goBack={handleGoBack}
+          />
+        )}
+        {view === "carrito" && <OrderCart cart={cart} setCart={setCart} />}
+        {view === "login" && <Login onLogin={handleLogin} />}
+        {view === "admin" && isAdminLogged && <AdminProductForm />}
+      </div>
     </div>
   );
 }

@@ -6,7 +6,7 @@ const OrderCart = ({ cart, setCart }) => {
   const handleConfirmOrder = async () => {
     if (cart.length === 0) return;
 
-    // cart => array con { id, cantidad, talla, color, ... }
+    // cart => array con { id, descripcion, precio, cantidad, talla, color, foto/fotos }
     const productosPedido = cart.map((item) => ({
       id: item.id,
       cantidad: item.cantidad,
@@ -19,7 +19,7 @@ const OrderCart = ({ cart, setCart }) => {
         productos: productosPedido,
       });
       alert(
-        `Pedido creado. ID: ${res.data.pedidoId}, Total: $${res.data.total}`
+        `Pedido creado. ID: ${res.data.pedidoId}, Total: Q${res.data.total}`
       );
       // Vaciar carrito
       setCart([]);
@@ -33,35 +33,85 @@ const OrderCart = ({ cart, setCart }) => {
     setCart(cart.filter((_, i) => i !== index));
   };
 
+  // Calcular total general
+  let total = 0;
+  cart.forEach((item) => {
+    total += item.precio * item.cantidad;
+  });
+
   return (
-    <div>
-      <h2>Carrito</h2>
+    <div className="cart">
+      <h2 className="cart-title">Carrito</h2>
+
       {cart.length === 0 ? (
-        <p>No hay productos en el carrito.</p>
+        <p className="cart-empty">No hay productos en el carrito.</p>
       ) : (
         <>
-          <ul>
-            {cart.map((item, index) => (
-              <li key={index}>
-                <strong>{item.descripcion}</strong>
-                <br />
-                Talla: {item.talla}
-                <br />
-                Color: {item.color}
-                <br />
-                Cantidad: {item.cantidad}
-                <br />
-                Precio Unitario: Q{item.precio}
-                <button
-                  onClick={() => removeItem(index)}
-                  style={{ marginLeft: "1rem" }}
+          <table className="table cart-table">
+            <thead>
+              <tr>
+                <th>Foto</th>
+                <th>Producto</th>
+                <th>Talla</th>
+                <th>Color</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Subtotal</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {cart.map((item, index) => {
+                const subTotal = item.precio * item.cantidad;
+                return (
+                  <tr key={index} className="cart-item">
+                    <td>
+                      {/* Si usas item.fotos, podrías hacer item.fotos[0] */}
+                      <img
+                        className="cart-image"
+                        src={
+                          item.foto
+                            ? `data:image/jpeg;base64,${item.fotos[0]}`
+                            : "https://via.placeholder.com/80?text=No+Image"
+                        }
+                        alt={item.descripcion}
+                      />
+                    </td>
+                    <td>
+                      <strong>{item.descripcion}</strong>
+                    </td>
+                    <td>{item.talla}</td>
+                    <td>{item.color}</td>
+                    <td>{item.cantidad}</td>
+                    <td>Q{item.precio}</td>
+                    <td>Q{subTotal}</td>
+                    <td>
+                      <button
+                        className="cart-remove-button"
+                        onClick={() => removeItem(index)}
+                      >
+                        Eliminar
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+            <tfoot>
+              <tr>
+                <td
+                  colSpan="7"
+                  style={{ textAlign: "right", fontWeight: "bold" }}
                 >
-                  Eliminar
-                </button>
-              </li>
-            ))}
-          </ul>
-          <button onClick={handleConfirmOrder}>Confirmar Pedido</button>
+                  Total: Q{total}
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+
+          <button className="cart-confirm-button" onClick={handleConfirmOrder}>
+            Confirmar Pedido
+          </button>
         </>
       )}
     </div>
