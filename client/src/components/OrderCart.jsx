@@ -6,17 +6,7 @@ const OrderCart = ({ cart, setCart }) => {
   const handleConfirmOrder = async () => {
     if (cart.length === 0) return;
 
-    /*
-      Antes enviábamos un array de {id, cantidad},
-      pero ahora tenemos talla y color. 
-      Dependiendo de tu backend, podrías necesitar 
-      guardarlo o no en la tabla "pedidos_detalles".
-      Por ejemplo, podrías añadir columnas 'talla' y 'color'
-      en tu base de datos. (Opcional, si lo deseas).
-    */
-
-    // Adaptar para tu backend. Si el backend no soporta talla/ color,
-    // solo mandamos {id, cantidad}.
+    // cart => array con { id, cantidad, talla, color, ... }
     const productosPedido = cart.map((item) => ({
       id: item.id,
       cantidad: item.cantidad,
@@ -31,6 +21,7 @@ const OrderCart = ({ cart, setCart }) => {
       alert(
         `Pedido creado. ID: ${res.data.pedidoId}, Total: $${res.data.total}`
       );
+      // Vaciar carrito
       setCart([]);
     } catch (error) {
       console.error(error);

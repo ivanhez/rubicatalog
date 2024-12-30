@@ -11,13 +11,6 @@ const ProductList = ({ onAddToCart, onSelectProduct }) => {
   const fetchProductos = async () => {
     try {
       const res = await axios.get("http://localhost:4000/api/productos");
-      /*
-        Cada producto tiene formato:
-        {
-          id, descripcion, talla, colores, precio,
-          fotos: [ "BASE64_1", "BASE64_2", ...]
-        }
-      */
       setProductos(res.data);
     } catch (error) {
       console.error(error);
@@ -25,42 +18,40 @@ const ProductList = ({ onAddToCart, onSelectProduct }) => {
   };
 
   return (
-    <div>
-      <h2>Catálogo de Productos</h2>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
-          gap: "1rem",
-        }}
-      >
+    <div className="section">
+      <h2 className="section-title">Catálogo de Productos</h2>
+      <div className="catalog-grid">
         {productos.map((prod) => (
           <div
             key={prod.id}
-            style={{
-              border: "1px solid #ccc",
-              padding: "1rem",
-              borderRadius: "5px",
-              textAlign: "center",
-              cursor: "pointer",
-            }}
+            className="product-card"
+            onClick={() => onSelectProduct(prod.id)}
           >
-            {/* Mostrar la primera imagen más grande */}
             {prod.fotos && prod.fotos.length > 0 && (
               <img
+                className="product-image"
                 src={`data:image/jpeg;base64,${prod.fotos[0]}`}
                 alt={prod.descripcion}
-                style={{ width: "200px", height: "200px", objectFit: "cover" }}
-                onClick={() => onSelectProduct(prod.id)}
-                /* 
-                  onSelectProduct => función que lleva al detalle del producto
-                  (podrías usar React Router, un modal, etc.)
-                */
               />
             )}
-            <h3>{prod.descripcion}</h3>
-            <p>Precio: Q{prod.precio}</p>
-            <button onClick={() => onAddToCart(prod)}>
+            <h3 className="product-title">{prod.descripcion}</h3>
+            <p className="product-price">${prod.precio}</p>
+            <button
+              className="product-button"
+              // Evita que el onClick del card te mande siempre al detalle
+              // al hacer click en el botón. Podrías hacer e.stopPropagation()
+              onClick={(e) => {
+                e.stopPropagation();
+                onAddToCart({
+                  id: prod.id,
+                  descripcion: prod.descripcion,
+                  precio: prod.precio,
+                  cantidad: 1,
+                  talla: prod.talla || "Única",
+                  color: prod.colores || "Único",
+                });
+              }}
+            >
               Agregar al carrito
             </button>
           </div>

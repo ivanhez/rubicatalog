@@ -1,3 +1,4 @@
+// App.jsx
 import React, { useState, useEffect } from "react";
 import ProductList from "./components/ProductList";
 import ProductDetail from "./components/ProductDetail";
@@ -40,23 +41,14 @@ function App() {
     setView("catalogo");
   };
 
-  // onAddToCart ahora recibe un objeto con id, descripcion, precio, talla, color, cantidad
   const onAddToCart = (itemData) => {
-    /*
-      itemData => {
-        id, descripcion, precio, cantidad, talla, color
-      }
-    */
-    // Si ese ítem (mismo id, misma talla y color) ya existe, sumamos cantidad
     const existing = cart.find(
       (p) =>
         p.id === itemData.id &&
         p.talla === itemData.talla &&
         p.color === itemData.color
     );
-
     if (existing) {
-      // Aumentar cantidad
       setCart(
         cart.map((p) =>
           p === existing
@@ -65,10 +57,9 @@ function App() {
         )
       );
     } else {
-      // Agregar nuevo ítem
       setCart([...cart, itemData]);
     }
-    setView("carrito"); // Por ejemplo, ir directamente al carrito
+    setView("carrito");
   };
 
   const handleSelectProduct = (id) => {
@@ -82,9 +73,12 @@ function App() {
   };
 
   return (
-    <div style={{ padding: "1rem" }}>
-      <h1>Mi Tienda E-commerce</h1>
-      <nav style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
+    <div className="container">
+      <header className="header">
+        <h1>Mi Tienda E-commerce</h1>
+      </header>
+
+      <nav className="nav">
         <button onClick={() => setView("catalogo")}>Ver Catálogo</button>
         <button onClick={() => setView("carrito")}>
           Carrito ({cart.length})
