@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ProductList from "./components/ProductList";
+import ProductDetail from "./components/ProductDetail";
 import AdminProductForm from "./components/AdminProductForm";
 import OrderCart from "./components/OrderCart";
 import Login from "./components/Login";
@@ -8,12 +9,10 @@ import axios from "axios";
 function App() {
   const [view, setView] = useState("catalogo");
   const [isAdminLogged, setIsAdminLogged] = useState(false);
-
-  // Carrito de compras (array de productos con {id, descripcion, precio, cantidad})
   const [cart, setCart] = useState([]);
+  const [selectedProductId, setSelectedProductId] = useState(null);
 
   useEffect(() => {
-    // Verificar si existe el token en localStorage
     const token = localStorage.getItem("token");
     if (token) {
       setIsAdminLogged(true);
@@ -41,30 +40,54 @@ function App() {
     setView("catalogo");
   };
 
-  // Función para agregar producto al carrito
-  const addToCart = (producto) => {
-    // Si el producto ya está en el carrito, incrementar cantidad
-    const existing = cart.find((p) => p.id === producto.id);
+  // onAddToCart ahora recibe un objeto con id, descripcion, precio, talla, color, cantidad
+  const onAddToCart = (itemData) => {
+    /*
+      itemData => {
+        id, descripcion, precio, cantidad, talla, color
+      }
+    */
+    // Si ese ítem (mismo id, misma talla y color) ya existe, sumamos cantidad
+    const existing = cart.find(
+      (p) =>
+        p.id === itemData.id &&
+        p.talla === itemData.talla &&
+        p.color === itemData.color
+    );
+
     if (existing) {
+      // Aumentar cantidad
       setCart(
         cart.map((p) =>
-          p.id === producto.id ? { ...p, cantidad: p.cantidad + 1 } : p
+          p === existing
+            ? { ...p, cantidad: p.cantidad + itemData.cantidad }
+            : p
         )
       );
     } else {
-      setCart([...cart, { ...producto, cantidad: 1 }]);
+      // Agregar nuevo ítem
+      setCart([...cart, itemData]);
     }
+    setView("carrito"); // Por ejemplo, ir directamente al carrito
+  };
+
+  const handleSelectProduct = (id) => {
+    setSelectedProductId(id);
+    setView("detalle");
+  };
+
+  const handleGoBack = () => {
+    setSelectedProductId(null);
     setView("catalogo");
   };
 
   return (
     <div style={{ padding: "1rem" }}>
-      <h1>Rubi Seduction</h1>
-      {/* Menú de navegación */}
+      <h1>Mi Tienda E-commerce</h1>
       <nav style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
         <button onClick={() => setView("catalogo")}>Ver Catálogo</button>
         <button onClick={() => setView("carrito")}>
-          Ver Carrito ({cart.length})
+          Carrito ({cart.length})
         </button>
         {!isAdminLogged ? (
           <button onClick={() => setView("login")}>Admin Login</button>
@@ -76,8 +99,19 @@ function App() {
         )}
       </nav>
 
-      {/* Secciones */}
-      {view === "catalogo" && <ProductList onAddToCart={addToCart} />}
+      {view === "catalogo" && (
+        <ProductList
+          onSelectProduct={handleSelectProduct}
+          onAddToCart={onAddToCart}
+        />
+      )}
+      {view === "detalle" && (
+        <ProductDetail
+          productId={selectedProductId}
+          onAddToCart={onAddToCart}
+          goBack={handleGoBack}
+        />
+      )}
       {view === "carrito" && <OrderCart cart={cart} setCart={setCart} />}
       {view === "login" && <Login onLogin={handleLogin} />}
       {view === "admin" && isAdminLogged && <AdminProductForm />}

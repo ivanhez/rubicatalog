@@ -1,6 +1,7 @@
 import express from "express";
 import {
   getAllProducts,
+  getProductById,
   createProduct,
   updateProduct,
   deleteProduct,
@@ -8,16 +9,10 @@ import {
 
 const router = express.Router();
 
-// GET /api/productos
-router.get("/", getAllProducts);
-
-// POST /api/productos
-router.post("/", createProduct);
-
-// PUT /api/productos/:id
-router.put("/:id", updateProduct);
-
-// DELETE /api/productos/:id
-router.delete("/:id", deleteProduct);
+router.get("/", getAllProducts); // GET /api/productos
+router.get("/:id", getProductById); // GET /api/productos/:id  (detalle)
+router.post("/", createProduct); // POST /api/productos
+router.put("/:id", updateProduct); // PUT /api/productos/:id
+router.delete("/:id", deleteProduct); // DELETE /api/productos/:id
 
 export default router;

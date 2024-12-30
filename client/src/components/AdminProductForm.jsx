@@ -9,7 +9,7 @@ const AdminProductForm = () => {
     talla: "",
     colores: "",
     precio: "",
-    foto: "",
+    fotos: [], // array de base64
   });
 
   useEffect(() => {
@@ -25,26 +25,35 @@ const AdminProductForm = () => {
     }
   };
 
-  // Manejar cambios en los inputs de texto
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Manejar la carga de archivo (imagen)
-  const handleFileChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  /**
+   * Manejar múltiples archivos
+   */
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
+    let promises = files.map((file) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+          const base64String = evt.target.result.split(",")[1];
+          resolve(base64String);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    });
 
-    // Convertir archivo a base64
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      const base64String = evt.target.result.split(",")[1];
-      setForm({ ...form, foto: base64String });
-    };
-    reader.readAsDataURL(file);
+    Promise.all(promises)
+      .then((base64Images) => {
+        // Concatenar nuevas imágenes con las que ya existen en form.fotos
+        setForm({ ...form, fotos: [...form.fotos, ...base64Images] });
+      })
+      .catch((err) => console.error(err));
   };
 
-  // Crear nuevo producto
   const handleCreate = async (e) => {
     e.preventDefault();
     try {
@@ -53,24 +62,16 @@ const AdminProductForm = () => {
         talla: form.talla,
         colores: form.colores,
         precio: form.precio,
-        foto: form.foto,
+        fotos: form.fotos,
       });
       alert("Producto creado");
-      setForm({
-        id: "",
-        descripcion: "",
-        talla: "",
-        colores: "",
-        precio: "",
-        foto: "",
-      });
+      resetForm();
       fetchProductos();
     } catch (error) {
       console.error(error);
     }
   };
 
-  // Seleccionar producto para edición
   const handleSelectProduct = (prod) => {
     setForm({
       id: prod.id,
@@ -78,11 +79,10 @@ const AdminProductForm = () => {
       talla: prod.talla,
       colores: prod.colores,
       precio: prod.precio,
-      foto: prod.foto, // base64
+      fotos: prod.fotos || [], // array base64
     });
   };
 
-  // Actualizar producto
   const handleUpdate = async () => {
     try {
       await axios.put(`http://localhost:4000/api/productos/${form.id}`, {
@@ -90,24 +90,16 @@ const AdminProductForm = () => {
         talla: form.talla,
         colores: form.colores,
         precio: form.precio,
-        foto: form.foto,
+        fotos: form.fotos,
       });
       alert("Producto actualizado");
-      setForm({
-        id: "",
-        descripcion: "",
-        talla: "",
-        colores: "",
-        precio: "",
-        foto: "",
-      });
+      resetForm();
       fetchProductos();
     } catch (error) {
       console.error(error);
     }
   };
 
-  // Eliminar producto
   const handleDelete = async (id) => {
     try {
       await axios.delete(`http://localhost:4000/api/productos/${id}`);
@@ -116,6 +108,17 @@ const AdminProductForm = () => {
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const resetForm = () => {
+    setForm({
+      id: "",
+      descripcion: "",
+      talla: "",
+      colores: "",
+      precio: "",
+      fotos: [],
+    });
   };
 
   return (
@@ -162,19 +165,28 @@ const AdminProductForm = () => {
           />
         </div>
         <div>
-          <label>Imagen (base64):</label>
-          <input type="file" accept="image/*" onChange={handleFileChange} />
-          {/* Si deseas ver un preview de la imagen base64 */}
-          {form.foto && (
-            <div style={{ marginTop: "1rem" }}>
-              <img
-                src={`data:image/png;base64,${form.foto}`}
-                alt="preview"
-                style={{ width: 100, height: 100, objectFit: "cover" }}
-              />
-            </div>
-          )}
+          <label>Imágenes (base64):</label>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleFileChange}
+          />
         </div>
+
+        {form.fotos.length > 0 && (
+          <div style={{ display: "flex", gap: "1rem", margin: "1rem 0" }}>
+            {form.fotos.map((foto, idx) => (
+              <img
+                key={idx}
+                src={`data:image/jpeg;base64,${foto}`}
+                alt="preview"
+                style={{ width: 80, height: 80, objectFit: "cover" }}
+              />
+            ))}
+          </div>
+        )}
+
         <div style={{ marginTop: "1rem" }}>
           <button type="submit">Crear Producto</button>
           {form.id && (
@@ -201,7 +213,7 @@ const AdminProductForm = () => {
             <th>Talla</th>
             <th>Colores</th>
             <th>Precio</th>
-            <th>Foto (base64)</th>
+            <th>Imágenes</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -214,16 +226,22 @@ const AdminProductForm = () => {
               <td>{prod.colores}</td>
               <td>{prod.precio}</td>
               <td>
-                {prod.foto && (
-                  <img
-                    src={`data:image/png;base64,${prod.foto}`}
-                    alt={prod.descripcion}
-                    style={{
-                      width: "80px",
-                      height: "80px",
-                      objectFit: "cover",
-                    }}
-                  />
+                {prod.fotos && prod.fotos.length > 0 ? (
+                  prod.fotos.map((foto, idx) => (
+                    <img
+                      key={idx}
+                      src={`data:image/jpeg;base64,${foto}`}
+                      alt="prod"
+                      style={{
+                        width: 50,
+                        height: 50,
+                        objectFit: "cover",
+                        marginRight: 5,
+                      }}
+                    />
+                  ))
+                ) : (
+                  <span>Sin imágenes</span>
                 )}
               </td>
               <td>

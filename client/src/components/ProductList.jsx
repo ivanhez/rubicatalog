@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const ProductList = ({ onAddToCart }) => {
+const ProductList = ({ onAddToCart, onSelectProduct }) => {
   const [productos, setProductos] = useState([]);
 
   useEffect(() => {
@@ -11,6 +11,13 @@ const ProductList = ({ onAddToCart }) => {
   const fetchProductos = async () => {
     try {
       const res = await axios.get("http://localhost:4000/api/productos");
+      /*
+        Cada producto tiene formato:
+        {
+          id, descripcion, talla, colores, precio,
+          fotos: [ "BASE64_1", "BASE64_2", ...]
+        }
+      */
       setProductos(res.data);
     } catch (error) {
       console.error(error);
@@ -23,7 +30,7 @@ const ProductList = ({ onAddToCart }) => {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(3,1fr)",
+          gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
           gap: "1rem",
         }}
       >
@@ -35,24 +42,24 @@ const ProductList = ({ onAddToCart }) => {
               padding: "1rem",
               borderRadius: "5px",
               textAlign: "center",
+              cursor: "pointer",
             }}
           >
-            {/* Renderizar imagen base64 */}
-            {prod.foto && (
+            {/* Mostrar la primera imagen más grande */}
+            {prod.fotos && prod.fotos.length > 0 && (
               <img
-                src={`data:image/png;base64,${prod.foto}`}
+                src={`data:image/jpeg;base64,${prod.fotos[0]}`}
                 alt={prod.descripcion}
-                style={{
-                  maxWidth: "100px",
-                  maxHeight: "100px",
-                  objectFit: "cover",
-                }}
+                style={{ width: "200px", height: "200px", objectFit: "cover" }}
+                onClick={() => onSelectProduct(prod.id)}
+                /* 
+                  onSelectProduct => función que lleva al detalle del producto
+                  (podrías usar React Router, un modal, etc.)
+                */
               />
             )}
             <h3>{prod.descripcion}</h3>
-            <p>Talla: {prod.talla}</p>
-            <p>Colores: {prod.colores}</p>
-            <p>Precio: ${prod.precio}</p>
+            <p>Precio: Q{prod.precio}</p>
             <button onClick={() => onAddToCart(prod)}>
               Agregar al carrito
             </button>

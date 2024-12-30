@@ -6,10 +6,22 @@ const OrderCart = ({ cart, setCart }) => {
   const handleConfirmOrder = async () => {
     if (cart.length === 0) return;
 
-    // Transformar {id, descripcion, ...} a {id, cantidad}
+    /*
+      Antes enviábamos un array de {id, cantidad},
+      pero ahora tenemos talla y color. 
+      Dependiendo de tu backend, podrías necesitar 
+      guardarlo o no en la tabla "pedidos_detalles".
+      Por ejemplo, podrías añadir columnas 'talla' y 'color'
+      en tu base de datos. (Opcional, si lo deseas).
+    */
+
+    // Adaptar para tu backend. Si el backend no soporta talla/ color,
+    // solo mandamos {id, cantidad}.
     const productosPedido = cart.map((item) => ({
       id: item.id,
       cantidad: item.cantidad,
+      talla: item.talla,
+      color: item.color,
     }));
 
     try {
@@ -19,7 +31,6 @@ const OrderCart = ({ cart, setCart }) => {
       alert(
         `Pedido creado. ID: ${res.data.pedidoId}, Total: $${res.data.total}`
       );
-      // Limpiar carrito
       setCart([]);
     } catch (error) {
       console.error(error);
@@ -27,8 +38,8 @@ const OrderCart = ({ cart, setCart }) => {
     }
   };
 
-  const removeItem = (id) => {
-    setCart(cart.filter((item) => item.id !== id));
+  const removeItem = (index) => {
+    setCart(cart.filter((_, i) => i !== index));
   };
 
   return (
@@ -39,12 +50,19 @@ const OrderCart = ({ cart, setCart }) => {
       ) : (
         <>
           <ul>
-            {cart.map((item) => (
-              <li key={item.id}>
-                {item.descripcion} - Cantidad: {item.cantidad} - Precio: $
-                {item.precio}
+            {cart.map((item, index) => (
+              <li key={index}>
+                <strong>{item.descripcion}</strong>
+                <br />
+                Talla: {item.talla}
+                <br />
+                Color: {item.color}
+                <br />
+                Cantidad: {item.cantidad}
+                <br />
+                Precio Unitario: Q{item.precio}
                 <button
-                  onClick={() => removeItem(item.id)}
+                  onClick={() => removeItem(index)}
                   style={{ marginLeft: "1rem" }}
                 >
                   Eliminar
