@@ -4,10 +4,16 @@ import axios from "axios";
 const ProductDetail = ({ productId, onAddToCart, goBack }) => {
   const [producto, setProducto] = useState(null);
 
-  // Estados para almacenar la selección del usuario
+  // Estados para la selección del usuario
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [quantity, setQuantity] = useState(1);
+
+  // Estado para el carrusel infinito
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Estado para controlar el modal (imagen grande)
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -15,46 +21,56 @@ const ProductDetail = ({ productId, onAddToCart, goBack }) => {
         const res = await axios.get(
           `http://localhost:4000/api/productos/${productId}`
         );
-        /*
-          res.data => {
-            id, descripcion, talla, colores, precio,
-            fotos: ["BASE64_1", "BASE64_2", ...]
-          }
-        */
         setProducto(res.data);
       } catch (error) {
         console.error(error);
       }
     };
-
     if (productId) {
       fetchProduct();
     }
   }, [productId]);
 
-  // Cuando el producto llega, definimos una talla y color por defecto (opcional)
+  // Configurar talla y color por defecto
   useEffect(() => {
     if (producto) {
-      // Por ejemplo, tomar la primera talla y color como predeterminados
       const tallasArr = producto.talla ? producto.talla.split(",") : [];
       const coloresArr = producto.colores ? producto.colores.split(",") : [];
       if (tallasArr.length > 0) setSelectedSize(tallasArr[0].trim());
       if (coloresArr.length > 0) setSelectedColor(coloresArr[0].trim());
       setQuantity(1);
+      setCurrentSlide(0);
     }
   }, [producto]);
 
   if (!producto) {
-    return <p>Cargando detalle...</p>;
+    return <p className="loading">Cargando detalle...</p>;
   }
 
-  // Parsear las tallas y colores a arrays
   const tallas = producto.talla ? producto.talla.split(",") : [];
   const colores = producto.colores ? producto.colores.split(",") : [];
+  const fotos = producto.fotos || [];
 
-  // Manejar el click en "Agregar al Carrito"
+  // --- Carrusel infinito ---
+  const handlePrev = () => {
+    setCurrentSlide((prev) => (prev === 0 ? fotos.length - 1 : prev - 1));
+  };
+
+  const handleNext = () => {
+    setCurrentSlide((prev) => (prev === fotos.length - 1 ? 0 : prev + 1));
+  };
+
+  // --- Modal (imagen grande) ---
+  const handleOpenModal = () => {
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
+
+  // Agregar al carrito
   const handleAddToCart = () => {
-    // Construir un objeto con la info necesaria
     const itemToAdd = {
       id: producto.id,
       descripcion: producto.descripcion,
@@ -67,81 +83,130 @@ const ProductDetail = ({ productId, onAddToCart, goBack }) => {
   };
 
   return (
-    <div style={{ marginTop: "1rem" }}>
-      <button onClick={goBack}>Volver</button>
-      <h2>{producto.descripcion}</h2>
-      <p>Precio: Q{producto.precio}</p>
+    <div className="product-detail">
+      <button className="product-detail__back-button" onClick={goBack}>
+        Volver
+      </button>
 
-      {/* Tallas disponibles */}
-      {tallas.length > 0 && (
-        <div>
-          <label>Talla:</label>
-          <select
-            value={selectedSize}
-            onChange={(e) => setSelectedSize(e.target.value)}
-          >
-            {tallas.map((t) => (
-              <option key={t.trim()} value={t.trim()}>
-                {t.trim()}
-              </option>
-            ))}
-          </select>
+      <div className="product-detail__content">
+        {/* Carrusel a la izquierda */}
+        <div className="carousel-infinite">
+          {fotos && fotos.length > 0 ? (
+            <>
+              <button className="carousel-button" onClick={handlePrev}>
+                &lt;
+              </button>
+              {/* Al hacer clic en la imagen, abrimos el modal */}
+              <img
+                className="carousel-image"
+                src={`data:image/jpeg;base64,${fotos[currentSlide]}`}
+                alt={`Foto ${currentSlide + 1}`}
+                onClick={handleOpenModal}
+              />
+              <button className="carousel-button" onClick={handleNext}>
+                &gt;
+              </button>
+            </>
+          ) : (
+            <p>No hay imágenes disponibles.</p>
+          )}
         </div>
-      )}
 
-      {/* Colores disponibles */}
-      {colores.length > 0 && (
-        <div>
-          <label>Color:</label>
-          <select
-            value={selectedColor}
-            onChange={(e) => setSelectedColor(e.target.value)}
-          >
-            {colores.map((c) => (
-              <option key={c.trim()} value={c.trim()}>
-                {c.trim()}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
+        {/* Información del producto a la derecha */}
+        <div className="product-detail__info">
+          <h2 className="product-detail__title">{producto.descripcion}</h2>
+          <p className="product-detail__price">Precio: Q{producto.precio}</p>
 
-      {/* Cantidad */}
-      <div>
-        <label>Cantidad:</label>
-        <input
-          type="number"
-          min="1"
-          value={quantity}
-          onChange={(e) => setQuantity(e.target.value)}
-          style={{ width: "60px" }}
-        />
-      </div>
+          {/* Tallas */}
+          {tallas.length > 0 && (
+            <div className="size-selector">
+              <p className="selector-label">Talla:</p>
+              <div className="selector-buttons">
+                {tallas.map((talla) => {
+                  const trimmed = talla.trim();
+                  return (
+                    <button
+                      key={trimmed}
+                      className={`selector-button ${
+                        selectedSize === trimmed ? "active" : ""
+                      }`}
+                      onClick={() => setSelectedSize(trimmed)}
+                    >
+                      {trimmed}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
-      {/* Mostrar todas las fotos */}
-      <div
-        style={{
-          display: "flex",
-          gap: "1rem",
-          marginBottom: "1rem",
-          marginTop: "1rem",
-        }}
-      >
-        {producto.fotos && producto.fotos.length > 0 ? (
-          producto.fotos.map((fotoBase64, index) => (
-            <img
-              key={index}
-              src={`data:image/jpeg;base64,${fotoBase64}`}
-              alt={`Foto ${index + 1}`}
-              style={{ width: "200px", height: "200px", objectFit: "cover" }}
+          {/* Colores */}
+          {colores.length > 0 && (
+            <div className="color-selector">
+              <p className="selector-label">Color:</p>
+              <div className="selector-buttons">
+                {colores.map((color) => {
+                  const trimmed = color.trim();
+                  return (
+                    <button
+                      key={trimmed}
+                      className={`selector-button ${
+                        selectedColor === trimmed ? "active" : ""
+                      }`}
+                      onClick={() => setSelectedColor(trimmed)}
+                    >
+                      {trimmed}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Cantidad */}
+          <div className="quantity-selector">
+            <label htmlFor="quantity">Cantidad:</label>
+            <input
+              id="quantity"
+              type="number"
+              min="1"
+              value={quantity}
+              onChange={(e) => setQuantity(e.target.value)}
+              className="quantity-input"
             />
-          ))
-        ) : (
-          <p>No hay imágenes para este producto.</p>
-        )}
+          </div>
+
+          <button className="add-to-cart-button" onClick={handleAddToCart}>
+            Agregar al Carrito
+          </button>
+        </div>
       </div>
 
-      <button onClick={handleAddToCart}>Agregar al Carrito</button>
+      {/* Modal de imagen grande, con carrusel infinito */}
+      {showModal && (
+        <div className="modal-overlay" onClick={handleCloseModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="close-button" onClick={handleCloseModal}>
+              X
+            </button>
+
+            {/* El mismo carrusel, pero mostrando la imagen en grande */}
+            <div className="modal-carousel">
+              <button className="carousel-button" onClick={handlePrev}>
+                &lt;
+              </button>
+              <img
+                className="modal-image"
+                src={`data:image/jpeg;base64,${fotos[currentSlide]}`}
+                alt={`Foto grande ${currentSlide + 1}`}
+              />
+              <button className="carousel-button" onClick={handleNext}>
+                &gt;
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

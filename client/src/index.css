@@ -167,3 +167,231 @@ body {
     height: auto;
   }
 }
+
+/* --- index.css --- */
+
+/* PRODUCT DETAIL (contenedor general) */
+.product-detail {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  position: relative; /* Para organizar layout interno */
+}
+
+.product-detail__back-button {
+  background-color: #777;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.product-detail__back-button:hover {
+  background-color: #555;
+}
+
+/* Contenedor que divide la imagen a la izq y la info a la derecha */
+.product-detail__content {
+  display: flex;
+  gap: 2rem; /* Separación entre carrusel e info */
+}
+
+/* CAROUSEL INFINITE */
+.carousel-infinite {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Botones del carrusel */
+.carousel-button {
+  background-color: #2980b9;
+  color: #fff;
+  font-size: 1.2rem;
+  border: none;
+  padding: 0.5rem 0.8rem;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.carousel-button:hover {
+  background-color: #3498db;
+}
+
+/* Imagen del carrusel */
+.carousel-image {
+  width: 300px;
+  height: 300px;
+  object-fit: cover;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* INFORMACIÓN DEL PRODUCTO (a la derecha) */
+.product-detail__info {
+  flex: 1; /* Para que se ajuste al espacio disponible */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+/* Título y precio */
+.product-detail__title {
+  font-size: 1.5rem;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+.product-detail__price {
+  font-weight: bold;
+  color: #e74c3c;
+  margin-bottom: 1rem;
+}
+
+/* SELECTORES DE TALLA Y COLOR */
+.selector-label {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.selector-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.selector-button {
+  border: 1px solid #ddd;
+  background-color: #f3f3f3;
+  color: #333;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.selector-button:hover {
+  background-color: #eee;
+}
+.selector-button.active {
+  background-color: #27ae60;
+  color: #fff;
+  border-color: #27ae60;
+}
+
+/* Cantidad */
+.quantity-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.quantity-input {
+  width: 60px;
+  padding: 0.3rem;
+}
+
+/* BOTÓN AGREGAR AL CARRITO */
+.add-to-cart-button {
+  background-color: #27ae60;
+  color: #fff;
+  border: none;
+  padding: 0.7rem 1rem;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 1rem;
+  margin-top: 1rem; /* Separar un poco del resto */
+}
+.add-to-cart-button:hover {
+  background-color: #2ecc71;
+}
+
+/* LOADING */
+.loading {
+  font-size: 1.2rem;
+  text-align: center;
+  margin: 2rem 0;
+}
+
+/* --- index.css --- */
+
+/* overlay para el modal: pantalla completa, fondo oscuro semitransparente */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999; /* encima de todo */
+}
+
+
+/* botón de cerrar */
+.close-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background-color: #999;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+}
+.close-button:hover {
+  background-color: #777;
+}
+
+/* imagen grande dentro del modal */
+.modal-image {
+  display: block;
+  max-width: 100%;
+  max-height: 80vh; /* no sobresalga de la ventana */
+  margin: 0 auto;
+}
+
+/* overlay para el modal: pantalla completa, fondo oscuro semitransparente */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999; /* encima de todo */
+}
+
+
+/* botón de cerrar */
+.close-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background-color: #999;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+}
+.close-button:hover {
+  background-color: #777;
+}
+
+/* carrusel dentro del modal */
+.modal-carousel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+  justify-content: center;
+}
