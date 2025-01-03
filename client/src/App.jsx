@@ -1,19 +1,38 @@
 // App.jsx
 import React, { useState, useEffect } from "react";
+import { Routes, Route, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
+// Importar páginas
+import CatalogPage from "./pages/CatalogPage";
+import DetailPage from "./pages/DetailPage";
+import CartPage from "./pages/CartPage";
+import LoginPage from "./pages/LoginPage";
+import AdminPage from "./pages/AdminPage";
+
+// Importar componentes (o podrías importarlos dentro de las páginas)
 import ProductList from "./components/ProductList";
 import ProductDetail from "./components/ProductDetail";
 import AdminProductForm from "./components/AdminProductForm";
 import OrderCart from "./components/OrderCart";
 import Login from "./components/Login";
 
+/** Ruta protegida básica */
+function ProtectedRoute({ isAdmin, children }) {
+  if (!isAdmin) {
+    return (
+      <h2 style={{ textAlign: "center", marginTop: "2rem" }}>No Autorizado</h2>
+    );
+  }
+  return children;
+}
+
 function App() {
-  const [view, setView] = useState("catalogo");
   const [isAdminLogged, setIsAdminLogged] = useState(false);
   const [cart, setCart] = useState([]);
-  const [selectedProductId, setSelectedProductId] = useState(null);
+  const navigate = useNavigate();
 
+  // Al montar, revisamos si hay token en localStorage
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -21,6 +40,7 @@ function App() {
     }
   }, []);
 
+  /** Login */
   const handleLogin = async (password) => {
     try {
       const res = await axios.post("http://localhost:4000/api/login", {
@@ -29,20 +49,23 @@ function App() {
       if (res.data.token) {
         localStorage.setItem("token", res.data.token);
         setIsAdminLogged(true);
-        setView("admin");
+        navigate("/admin"); // Redirigir a Admin
       }
     } catch (error) {
       alert("Contraseña incorrecta");
     }
   };
 
+  /** Logout */
   const handleLogout = () => {
     localStorage.removeItem("token");
     setIsAdminLogged(false);
-    setView("catalogo");
+    navigate("/"); // Regresar al catálogo
   };
 
+  /** Agregar al carrito */
   const onAddToCart = (itemData) => {
+    // itemData => {id, descripcion, precio, talla, color, cantidad}
     const existing = cart.find(
       (p) =>
         p.id === itemData.id &&
@@ -50,6 +73,7 @@ function App() {
         p.color === itemData.color
     );
     if (existing) {
+      // Aumentar cantidad
       setCart(
         cart.map((p) =>
           p === existing
@@ -60,88 +84,86 @@ function App() {
     } else {
       setCart([...cart, itemData]);
     }
-    setView("carrito");
-  };
-
-  const handleSelectProduct = (id) => {
-    setSelectedProductId(id);
-    setView("detalle");
-  };
-
-  const handleGoBack = () => {
-    setSelectedProductId(null);
-    setView("catalogo");
+    navigate("/carrito");
   };
 
   return (
     <div className="container">
       {/* HEADER */}
       <header className="header">
-        <h1 onClick={() => setView("catalogo")}>Rubi Seduction</h1>
+        {/* Al hacer click en el título, te lleva al home (catálogo) */}
+        <h1 style={{ cursor: "pointer" }} onClick={() => navigate("/")}>
+          Rubi Seduction
+        </h1>
+
+        {/* Barra de navegación */}
         <nav className="nav">
-          <button onClick={() => setView("catalogo")}>Catálogo</button>
-          <button onClick={() => setView("carrito")}>
+          <button onClick={() => navigate("/")}>Catálogo</button>
+          <button onClick={() => navigate("/carrito")}>
             Carrito ({cart.length})
           </button>
           {!isAdminLogged ? (
-            <button onClick={() => setView("login")}>Admin Login</button>
+            <button onClick={() => navigate("/login")}>Admin Login</button>
           ) : (
             <>
-              <button onClick={() => setView("admin")}>Administración</button>
+              <button onClick={() => navigate("/admin")}>Administración</button>
               <button onClick={handleLogout}>Cerrar Sesión</button>
             </>
           )}
         </nav>
       </header>
 
-      {/* MAIN CONTENT */}
-      {view === "catalogo" && (
-        <>
-          {/* HERO opcional */}
-          <section className="hero">
-            <div className="hero-content">
-              <h1>Descubre nuestra nueva colección</h1>
-              <p>Sensualidad y elegancia en cada prenda</p>
-              <a
-                className="hero-button"
-                href="#"
-                onClick={() => setView("catalogo")}
-              >
-                ¡Comprar Ahora!
-              </a>
-            </div>
-          </section>
+      {/* DEFINICIÓN DE RUTAS */}
+      <Routes>
+        {/* Ruta principal (catálogo) */}
+        <Route path="/" element={<CatalogPage onAddToCart={onAddToCart} />} />
 
-          <section className="section">
-            <ProductList
-              onSelectProduct={handleSelectProduct}
-              onAddToCart={onAddToCart}
-            />
-          </section>
-        </>
-      )}
-
-      {view === "detalle" && (
-        <ProductDetail
-          productId={selectedProductId}
-          onAddToCart={onAddToCart}
-          goBack={handleGoBack}
+        {/* Detalle de producto */}
+        <Route
+          path="/detalle/:id"
+          element={<DetailPage onAddToCart={onAddToCart} />}
         />
-      )}
-      {view === "carrito" && <OrderCart cart={cart} setCart={setCart} />}
-      {view === "login" && <Login onLogin={handleLogin} />}
-      {view === "admin" && isAdminLogged && <AdminProductForm />}
 
-      {/* FOOTER (Opcional) */}
+        {/* Carrito */}
+        <Route
+          path="/carrito"
+          element={<CartPage cart={cart} setCart={setCart} />}
+        />
+
+        {/* Login */}
+        <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
+
+        {/* Admin (ruta protegida) */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute isAdmin={isAdminLogged}>
+              <AdminPage />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Cualquier otra ruta: se redirige a / (opcional) */}
+        <Route
+          path="*"
+          element={
+            <h2 style={{ textAlign: "center", marginTop: "2rem" }}>
+              404: Página no encontrada
+            </h2>
+          }
+        />
+      </Routes>
+
+      {/* FOOTER */}
       <footer>
         <div className="footer-content">
           <div className="footer-col">
             <h3>Sobre Nosotros</h3>
-            <p>Tu tienda de lencería de confianza.</p>
+            {/* <p>Tu tienda de lencería de confianza.</p> */}
           </div>
           <div className="footer-col">
             <h3>Contacto</h3>
-            <p>Email: info@mitienda.com</p>
+            {/* <p>Email: info@mitienda.com</p> */}
           </div>
         </div>
       </footer>
