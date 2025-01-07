@@ -4,7 +4,7 @@ import axios from "axios";
 const ProductDetail = ({ productId, onAddToCart, goBack }) => {
   const [producto, setProducto] = useState(null);
 
-  // Estados para la selección del usuario
+  // Estados para la selección del usuario (sin preselección)
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [quantity, setQuantity] = useState(1);
@@ -31,13 +31,10 @@ const ProductDetail = ({ productId, onAddToCart, goBack }) => {
     }
   }, [productId]);
 
-  // Configurar talla y color por defecto
+  // NO asignamos talla ni color inicial
+  // Solo quantity y currentSlide:
   useEffect(() => {
     if (producto) {
-      const tallasArr = producto.talla ? producto.talla.split(",") : [];
-      const coloresArr = producto.colores ? producto.colores.split(",") : [];
-      if (tallasArr.length > 0) setSelectedSize(tallasArr[0].trim());
-      if (coloresArr.length > 0) setSelectedColor(coloresArr[0].trim());
       setQuantity(1);
       setCurrentSlide(0);
     }
@@ -64,7 +61,6 @@ const ProductDetail = ({ productId, onAddToCart, goBack }) => {
   const handleOpenModal = () => {
     setShowModal(true);
   };
-
   const handleCloseModal = () => {
     setShowModal(false);
   };
@@ -94,9 +90,8 @@ const ProductDetail = ({ productId, onAddToCart, goBack }) => {
           {fotos && fotos.length > 0 ? (
             <>
               <button className="carousel-button" onClick={handlePrev}>
-                &lt;
+                {"<"}
               </button>
-              {/* Al hacer clic en la imagen, abrimos el modal */}
               <img
                 className="carousel-image"
                 src={`data:image/jpeg;base64,${fotos[currentSlide]}`}
@@ -104,7 +99,7 @@ const ProductDetail = ({ productId, onAddToCart, goBack }) => {
                 onClick={handleOpenModal}
               />
               <button className="carousel-button" onClick={handleNext}>
-                &gt;
+                {">"}
               </button>
             </>
           ) : (
@@ -182,18 +177,17 @@ const ProductDetail = ({ productId, onAddToCart, goBack }) => {
         </div>
       </div>
 
-      {/* Modal de imagen grande, con carrusel infinito */}
+      {/* Modal de imagen grande */}
       {showModal && (
         <div className="modal-overlay" onClick={handleCloseModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <button className="close-button" onClick={handleCloseModal}>
               X
             </button>
-
-            {/* El mismo carrusel, pero mostrando la imagen en grande */}
+            {/* Reutilizamos el mismo carrusel en el modal */}
             <div className="modal-carousel">
               <button className="carousel-button" onClick={handlePrev}>
-                &lt;
+                {"<"}
               </button>
               <img
                 className="modal-image"
@@ -201,7 +195,7 @@ const ProductDetail = ({ productId, onAddToCart, goBack }) => {
                 alt={`Foto grande ${currentSlide + 1}`}
               />
               <button className="carousel-button" onClick={handleNext}>
-                &gt;
+                {">"}
               </button>
             </div>
           </div>

@@ -1,12 +1,14 @@
 import React from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const OrderCart = ({ cart, setCart }) => {
-  // Confirmar pedido
+  const navigate = useNavigate();
+
   const handleConfirmOrder = async () => {
     if (cart.length === 0) return;
 
-    // cart => array con { id, descripcion, precio, cantidad, talla, color, foto/fotos }
+    // 1. Construir array para enviar al backend
     const productosPedido = cart.map((item) => ({
       id: item.id,
       cantidad: item.cantidad,
@@ -14,14 +16,44 @@ const OrderCart = ({ cart, setCart }) => {
       color: item.color,
     }));
 
+    // 2. Calcular el total
+    let total = 0;
+    cart.forEach((item) => {
+      total += item.precio * item.cantidad;
+    });
+
     try {
+      // 3. Crear el pedido en tu backend
       const res = await axios.post("http://localhost:4000/api/pedidos", {
         productos: productosPedido,
       });
-      alert(
-        `Pedido creado. ID: ${res.data.pedidoId}, Total: Q${res.data.total}`
-      );
-      // Vaciar carrito
+
+      // 4. Preparar el texto con el detalle completo del carrito
+      /*
+        Ejemplo de mensaje:
+        "Detalles de mi pedido:
+         1) Conjunto Encaje, Talla: M, Color: Negro, Cantidad: 2
+         2) Body Rojo, Talla: S, Color: Rojo, Cantidad: 1
+         Total: Q120
+         ID Pedido: 12345"
+      */
+      let mensaje = "Detalles de mi pedido:\n";
+      cart.forEach((item, i) => {
+        mensaje += `${i + 1}) ${item.descripcion}, Talla: ${
+          item.talla
+        }, Color: ${item.color}, Cantidad: ${item.cantidad}\n`;
+      });
+      mensaje += `\nTotal: Q${total}\n`;
+    //   mensaje += `ID Pedido: ${res.data.pedidoId}`;
+
+      // 5. Abrir WhatsApp Web/Móvil con el mensaje
+      const phoneNumber = "50231383430"; // Reemplaza con tu número (código de país)
+      const waUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
+        mensaje
+      )}`;
+      window.open(waUrl, "_blank");
+
+      // 6. Vaciar carrito
       setCart([]);
     } catch (error) {
       console.error(error);
@@ -33,7 +65,7 @@ const OrderCart = ({ cart, setCart }) => {
     setCart(cart.filter((_, i) => i !== index));
   };
 
-  // Calcular total general
+  // Calcular total también para mostrarlo en la interfaz
   let total = 0;
   cart.forEach((item) => {
     total += item.precio * item.cantidad;
@@ -65,19 +97,24 @@ const OrderCart = ({ cart, setCart }) => {
                 const subTotal = item.precio * item.cantidad;
                 return (
                   <tr key={index} className="cart-item">
-                    <td>
-                      {/* Si usas item.fotos, podrías hacer item.fotos[0] */}
+                    <td
+                      style={{ cursor: "pointer" }}
+                      onClick={() => navigate(`/detalle/${item.id}`)}
+                    >
                       <img
                         className="cart-image"
                         src={
-                          item.foto
+                          item.fotos && item.fotos.length > 0
                             ? `data:image/jpeg;base64,${item.fotos[0]}`
                             : "https://via.placeholder.com/80?text=No+Image"
                         }
                         alt={item.descripcion}
                       />
                     </td>
-                    <td>
+                    <td
+                      style={{ cursor: "pointer" }}
+                      onClick={() => navigate(`/detalle/${item.id}`)}
+                    >
                       <strong>{item.descripcion}</strong>
                     </td>
                     <td>{item.talla}</td>

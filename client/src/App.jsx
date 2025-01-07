@@ -103,7 +103,8 @@ function App() {
             Carrito ({cart.length})
           </button>
           {!isAdminLogged ? (
-            <button onClick={() => navigate("/login")}>Admin Login</button>
+            // <button onClick={() => navigate("/login")}>Admin Login</button>
+            <></>
           ) : (
             <>
               <button onClick={() => navigate("/admin")}>Administración</button>
