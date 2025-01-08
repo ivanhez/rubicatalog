@@ -19,7 +19,7 @@ const ProductDetail = ({ productId, onAddToCart, goBack }) => {
     const fetchProduct = async () => {
       try {
         const res = await axios.get(
-          `http://rubiseduction.shop:4000/api/productos/${productId}`
+          `http://52.22.5.226:4000/api/productos/${productId}`
         );
         setProducto(res.data);
       } catch (error) {

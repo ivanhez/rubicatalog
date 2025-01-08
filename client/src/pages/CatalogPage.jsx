@@ -5,9 +5,9 @@ import ProductList from "../components/ProductList";
 function CatalogPage({ onAddToCart }) {
   // 1. Array de imágenes (puedes usar URLs reales, base64, o imports estáticos)
   const heroImages = [
-    "/images/3.png",
-    "/images/2.jpg",
-    "/images/3.png",
+    "/assets/images/3.png",
+    "/assets/images/2.jpg",
+    "/assets/images/3.png",
   ];
   // 2. Estado para el carrusel
   const [currentSlide, setCurrentSlide] = useState(0);

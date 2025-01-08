@@ -24,7 +24,7 @@ const OrderCart = ({ cart, setCart }) => {
 
     try {
       // 3. Crear el pedido en tu backend
-      const res = await axios.post("http://rubiseduction.shop:4000/api/pedidos", {
+      const res = await axios.post("http://52.22.5.226:4000/api/pedidos", {
         productos: productosPedido,
       });
 

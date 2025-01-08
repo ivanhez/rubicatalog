@@ -18,7 +18,7 @@ const AdminProductForm = () => {
 
   const fetchProductos = async () => {
     try {
-      const res = await axios.get("http://rubiseduction.shop:4000/api/productos");
+      const res = await axios.get("http://52.22.5.226:4000/api/productos");
       setProductos(res.data);
     } catch (error) {
       console.error(error);
@@ -57,7 +57,7 @@ const AdminProductForm = () => {
   const handleCreate = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://rubiseduction.shop:4000/api/productos", {
+      await axios.post("http://52.22.5.226:4000/api/productos", {
         descripcion: form.descripcion,
         talla: form.talla,
         colores: form.colores,
@@ -85,7 +85,7 @@ const AdminProductForm = () => {
 
   const handleUpdate = async () => {
     try {
-      await axios.put(`http://rubiseduction.shop:4000/api/productos/${form.id}`, {
+      await axios.put(`http://52.22.5.226:4000/api/productos/${form.id}`, {
         descripcion: form.descripcion,
         talla: form.talla,
         colores: form.colores,
@@ -102,7 +102,7 @@ const AdminProductForm = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://rubiseduction.shop:4000/api/productos/${id}`);
+      await axios.delete(`http://52.22.5.226:4000/api/productos/${id}`);
       alert("Producto eliminado");
       fetchProductos();
     } catch (error) {
