@@ -43,7 +43,7 @@ function App() {
   /** Login */
   const handleLogin = async (password) => {
     try {
-      const res = await axios.post("http://52.22.5.226:4000/api/login", {
+      const res = await axios.post("https://rubiseduction.shop:4000/api/login", {
         password,
       });
       if (res.data.token) {
