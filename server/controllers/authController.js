@@ -5,9 +5,11 @@ export const login = (req, res) => {
   const ADMIN_PASSWORD = "admin123";
 
   if (password === ADMIN_PASSWORD) {
+    console.log(1);
     // Token de ejemplo (hardcodeado). En producción usar librería JWT.
     return res.json({ token: "token-de-ejemplo" });
   } else {
+    console.log(2);
     return res.status(401).json({ message: "Contraseña incorrecta" });
   }
 };

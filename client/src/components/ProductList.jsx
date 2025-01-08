@@ -12,7 +12,7 @@ const ProductList = ({ onAddToCart }) => {
 
   const fetchProductos = async () => {
     try {
-      const res = await axios.get("http://localhost:4000/api/productos");
+      const res = await axios.get("http://rubiseduction.shop:4000/api/productos");
       setProductos(res.data);
     } catch (error) {
       console.error(error);
