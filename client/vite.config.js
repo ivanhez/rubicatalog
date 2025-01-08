@@ -10,7 +10,7 @@ export default defineConfig({
     port: 443,
     https: {
       key: fs.readFileSync('private.key'),
-      cert: fs.readFileSync('csr.pem'),
+      cert: fs.readFileSync('www_rubiseduction_shop.crt'),
     },
   },
   plugins: [react()],

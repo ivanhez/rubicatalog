@@ -1,6 +1,9 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import fs from "fs";
+import https from "https";
+
 dotenv.config();
 
 // Rutas
@@ -20,8 +23,20 @@ app.use("/api/login", authRoutes);
 app.use("/api/productos", productRoutes);
 app.use("/api/pedidos", orderRoutes);
 
-// Iniciar servidor
+// Cargar los certificados (reemplaza las rutas según tus archivos)
+const privateKey = fs.readFileSync("private.key");
+const certificate = fs.readFileSync("www_rubiseduction_shop.crt");
+
+// Crear credenciales
+const credentials = {
+  key: privateKey,
+  cert: certificate,
+};
+
+// Crear servidor HTTPS
+const httpsServer = https.createServer(credentials, app);
+
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log("Servidor escuchando en el puerto " + PORT);
+httpsServer.listen(PORT, () => {
+  console.log(`Servidor HTTPS escuchando en https://localhost:${PORT}`);
 });
