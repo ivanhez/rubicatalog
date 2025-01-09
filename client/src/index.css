@@ -817,3 +817,182 @@ footer {
 .carousel-button.next {
   right: 1rem;
 }
+/**********************************************
+  1. Contenedor principal del Admin
+**********************************************/
+.admin-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.admin-container h2 {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+/**********************************************
+  2. Formulario de administración
+**********************************************/
+.admin-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  background: #242424; /* o tu color preferido */
+  padding: 1rem;
+  border-radius: 5px;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 600px) {
+  .admin-form {
+    grid-template-columns: 1fr; /* una sola columna en móvil */
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: 0.3rem;
+  font-weight: 600;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="file"] {
+  padding: 0.4rem;
+  border-radius: 4px;
+  border: 1px solid #444;
+  background: #333;
+  color: #fff;
+}
+
+/**********************************************
+  3. Botones del formulario
+**********************************************/
+.form-actions {
+  grid-column: 1 / -1; /* Para que ocupe toda la fila */
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.btn-primary,
+.btn-secondary,
+.btn-reset {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: #a4005b;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background-color: #8b004d;
+}
+
+.btn-secondary {
+  background-color: #2980b9;
+  color: #fff;
+}
+
+.btn-secondary:hover {
+  background-color: #21618c;
+}
+
+.btn-reset {
+  background-color: #555;
+  color: #fff;
+}
+
+.btn-reset:hover {
+  background-color: #444;
+}
+
+/**********************************************
+  4. Previsualización de fotos
+**********************************************/
+.preview-container {
+  grid-column: 1 / -1; /* toda la fila */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.preview-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border: 1px solid #444;
+  border-radius: 4px;
+}
+
+/**********************************************
+  5. Tabla de productos
+**********************************************/
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 2rem;
+  background: #242424;
+  border: 1px solid #444;
+}
+
+.admin-table th,
+.admin-table td {
+  border: 1px solid #444;
+  padding: 0.5rem;
+  text-align: left;
+  color: #fff;
+}
+
+.admin-table th {
+  background-color: #333;
+  font-weight: 600;
+}
+
+.prod-image {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  margin-right: 5px;
+  border-radius: 4px;
+  border: 1px solid #444;
+}
+
+/**********************************************
+  6. Botón eliminar
+**********************************************/
+.btn-delete {
+  margin-left: 0.5rem;
+  background-color: #e74c3c;
+  color: #fff;
+  transition: background-color 0.2s ease;
+}
+
+.btn-delete:hover {
+  background-color: #c0392b;
+}
+
+/**********************************************
+  7. Responsividad para tabla en móvil
+**********************************************/
+@media (max-width: 600px) {
+  .admin-table th,
+  .admin-table td {
+    font-size: 0.9rem;
+    padding: 0.3rem;
+  }
+
+  .admin-table td img {
+    width: 40px;
+    height: 40px;
+  }
+}

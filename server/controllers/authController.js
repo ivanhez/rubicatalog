@@ -2,7 +2,7 @@ export const login = (req, res) => {
   const { password } = req.body;
 
   // Contraseña fija (en un entorno real, se guarda en .env)
-  const ADMIN_PASSWORD = "admin123";
+  const ADMIN_PASSWORD = "Secreto123**";
 
   if (password === ADMIN_PASSWORD) {
     console.log(1);

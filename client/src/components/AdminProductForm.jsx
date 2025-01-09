@@ -9,7 +9,7 @@ const AdminProductForm = () => {
     talla: "",
     colores: "",
     precio: "",
-    fotos: [], // array de base64
+    fotos: [],
   });
 
   useEffect(() => {
@@ -18,10 +18,13 @@ const AdminProductForm = () => {
 
   const fetchProductos = async () => {
     try {
-      const res = await axios.get("https://rubiseduction.shop:4000/api/productos");
+      const res = await axios.get(
+        "https://rubiseduction.shop:4000/api/productos"
+      );
       setProductos(res.data);
     } catch (error) {
       console.error(error);
+      alert("Error al cargar los productos.");
     }
   };
 
@@ -30,7 +33,7 @@ const AdminProductForm = () => {
   };
 
   /**
-   * Manejar múltiples archivos
+   * Manejo de archivos (múltiples)
    */
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
@@ -48,15 +51,20 @@ const AdminProductForm = () => {
 
     Promise.all(promises)
       .then((base64Images) => {
-        // Concatenar nuevas imágenes con las que ya existen en form.fotos
         setForm({ ...form, fotos: [...form.fotos, ...base64Images] });
       })
       .catch((err) => console.error(err));
   };
 
+  /**
+   * Crear producto
+   */
   const handleCreate = async (e) => {
     e.preventDefault();
     try {
+      const confirmCreate = window.confirm("¿Deseas crear este producto?");
+      if (!confirmCreate) return;
+
       await axios.post("https://rubiseduction.shop:4000/api/productos", {
         descripcion: form.descripcion,
         talla: form.talla,
@@ -64,14 +72,19 @@ const AdminProductForm = () => {
         precio: form.precio,
         fotos: form.fotos,
       });
-      alert("Producto creado");
+
+      alert("Producto creado exitosamente.");
       resetForm();
       fetchProductos();
     } catch (error) {
       console.error(error);
+      alert("Error al crear el producto.");
     }
   };
 
+  /**
+   * Seleccionar producto para edición
+   */
   const handleSelectProduct = (prod) => {
     setForm({
       id: prod.id,
@@ -79,37 +92,60 @@ const AdminProductForm = () => {
       talla: prod.talla,
       colores: prod.colores,
       precio: prod.precio,
-      fotos: prod.fotos || [], // array base64
+      fotos: prod.fotos || [],
     });
+    // Podrías hacer scroll al formulario (opcional)
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  /**
+   * Actualizar producto
+   */
   const handleUpdate = async () => {
     try {
-      await axios.put(`https://rubiseduction.shop:4000/api/productos/${form.id}`, {
-        descripcion: form.descripcion,
-        talla: form.talla,
-        colores: form.colores,
-        precio: form.precio,
-        fotos: form.fotos,
-      });
-      alert("Producto actualizado");
+      const confirmUpdate = window.confirm("¿Deseas actualizar este producto?");
+      if (!confirmUpdate) return;
+
+      await axios.put(
+        `https://rubiseduction.shop:4000/api/productos/${form.id}`,
+        {
+          descripcion: form.descripcion,
+          talla: form.talla,
+          colores: form.colores,
+          precio: form.precio,
+          fotos: form.fotos,
+        }
+      );
+
+      alert("Producto actualizado exitosamente.");
       resetForm();
       fetchProductos();
     } catch (error) {
       console.error(error);
+      alert("Error al actualizar el producto.");
     }
   };
 
+  /**
+   * Eliminar producto
+   */
   const handleDelete = async (id) => {
     try {
+      const confirmDelete = window.confirm("¿Deseas eliminar este producto?");
+      if (!confirmDelete) return;
+
       await axios.delete(`https://rubiseduction.shop:4000/api/productos/${id}`);
-      alert("Producto eliminado");
+      alert("Producto eliminado exitosamente.");
       fetchProductos();
     } catch (error) {
       console.error(error);
+      alert("Error al eliminar el producto.");
     }
   };
 
+  /**
+   * Resetear formulario
+   */
   const resetForm = () => {
     setForm({
       id: "",
@@ -122,10 +158,11 @@ const AdminProductForm = () => {
   };
 
   return (
-    <div>
+    <div className="admin-container">
       <h2>Administrar Productos</h2>
-      <form onSubmit={handleCreate} style={{ marginBottom: "1rem" }}>
-        <div>
+
+      <form onSubmit={handleCreate} className="admin-form">
+        <div className="form-group">
           <label>Descripción:</label>
           <input
             type="text"
@@ -135,7 +172,7 @@ const AdminProductForm = () => {
             required
           />
         </div>
-        <div>
+        <div className="form-group">
           <label>Talla:</label>
           <input
             type="text"
@@ -144,7 +181,7 @@ const AdminProductForm = () => {
             onChange={handleChange}
           />
         </div>
-        <div>
+        <div className="form-group">
           <label>Colores:</label>
           <input
             type="text"
@@ -153,7 +190,7 @@ const AdminProductForm = () => {
             onChange={handleChange}
           />
         </div>
-        <div>
+        <div className="form-group">
           <label>Precio:</label>
           <input
             type="number"
@@ -164,7 +201,7 @@ const AdminProductForm = () => {
             required
           />
         </div>
-        <div>
+        <div className="form-group">
           <label>Imágenes (base64):</label>
           <input
             type="file"
@@ -174,38 +211,42 @@ const AdminProductForm = () => {
           />
         </div>
 
+        {/* Previsualizar fotos seleccionadas */}
         {form.fotos.length > 0 && (
-          <div style={{ display: "flex", gap: "1rem", margin: "1rem 0" }}>
+          <div className="preview-container">
             {form.fotos.map((foto, idx) => (
               <img
                 key={idx}
                 src={`data:image/jpeg;base64,${foto}`}
                 alt="preview"
-                style={{ width: 80, height: 80, objectFit: "cover" }}
+                className="preview-image"
               />
             ))}
           </div>
         )}
 
-        <div style={{ marginTop: "1rem" }}>
-          <button type="submit">Crear Producto</button>
+        <div className="form-actions">
+          <button type="submit" className="btn-primary">
+            Crear Producto
+          </button>
           {form.id && (
             <button
               type="button"
               onClick={handleUpdate}
-              style={{ marginLeft: "1rem" }}
+              className="btn-secondary"
             >
               Actualizar Producto
+            </button>
+          )}
+          {form.id && (
+            <button type="button" onClick={resetForm} className="btn-reset">
+              Cancelar
             </button>
           )}
         </div>
       </form>
 
-      <table
-        border="1"
-        cellPadding="5"
-        style={{ width: "100%", textAlign: "left" }}
-      >
+      <table className="admin-table">
         <thead>
           <tr>
             <th>ID</th>
@@ -226,18 +267,13 @@ const AdminProductForm = () => {
               <td>{prod.colores}</td>
               <td>{prod.precio}</td>
               <td>
-                {prod.fotos && prod.fotos.length > 0 ? (
+                {Array.isArray(prod.fotos) && prod.fotos.length > 0 ? (
                   prod.fotos.map((foto, idx) => (
                     <img
                       key={idx}
                       src={`data:image/jpeg;base64,${foto}`}
                       alt="prod"
-                      style={{
-                        width: 50,
-                        height: 50,
-                        objectFit: "cover",
-                        marginRight: 5,
-                      }}
+                      className="prod-image"
                     />
                   ))
                 ) : (
@@ -250,7 +286,7 @@ const AdminProductForm = () => {
                 </button>
                 <button
                   onClick={() => handleDelete(prod.id)}
-                  style={{ marginLeft: "0.5rem" }}
+                  className="btn-delete"
                 >
                   Eliminar
                 </button>
