@@ -4,17 +4,18 @@ import axios from "axios";
 const ProductDetail = ({ productId, onAddToCart, goBack }) => {
   const [producto, setProducto] = useState(null);
 
-  // Estados para la selección del usuario (sin preselección)
+  // Estados para la selección del usuario
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [quantity, setQuantity] = useState(1);
 
-  // Estado para el carrusel infinito
+  // Carrusel infinito
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  // Estado para controlar el modal (imagen grande)
+  // Modal de imagen grande
   const [showModal, setShowModal] = useState(false);
 
+  // Cargar la info del producto
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -31,8 +32,7 @@ const ProductDetail = ({ productId, onAddToCart, goBack }) => {
     }
   }, [productId]);
 
-  // NO asignamos talla ni color inicial
-  // Solo quantity y currentSlide:
+  // Reiniciar quantity y currentSlide cuando se actualiza `producto`
   useEffect(() => {
     if (producto) {
       setQuantity(1);
@@ -48,22 +48,21 @@ const ProductDetail = ({ productId, onAddToCart, goBack }) => {
   const colores = producto.colores ? producto.colores.split(",") : [];
   const fotos = producto.fotos || [];
 
-  // --- Carrusel infinito ---
+  // Ordenar tallas y colores alfabéticamente (opcional)
+  tallas.sort();
+  colores.sort();
+
+  // Funciones del carrusel
   const handlePrev = () => {
     setCurrentSlide((prev) => (prev === 0 ? fotos.length - 1 : prev - 1));
   };
-
   const handleNext = () => {
     setCurrentSlide((prev) => (prev === fotos.length - 1 ? 0 : prev + 1));
   };
 
-  // --- Modal (imagen grande) ---
-  const handleOpenModal = () => {
-    setShowModal(true);
-  };
-  const handleCloseModal = () => {
-    setShowModal(false);
-  };
+  // Modal
+  const handleOpenModal = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
 
   // Agregar al carrito
   const handleAddToCart = () => {
@@ -78,6 +77,15 @@ const ProductDetail = ({ productId, onAddToCart, goBack }) => {
     onAddToCart(itemToAdd);
   };
 
+  // Opción: capitalizar la descripción
+  const titleCase = (str) => {
+    return str
+      .toLowerCase()
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
   return (
     <div className="product-detail">
       <button className="product-detail__back-button" onClick={goBack}>
@@ -85,11 +93,11 @@ const ProductDetail = ({ productId, onAddToCart, goBack }) => {
       </button>
 
       <div className="product-detail__content">
-        {/* Carrusel a la izquierda */}
+        {/* Carrusel de imágenes */}
         <div className="carousel-infinite">
           {fotos && fotos.length > 0 ? (
             <>
-              <button className="carousel-button" onClick={handlePrev}>
+              <button className="carousel-button prev" onClick={handlePrev}>
                 {"<"}
               </button>
               <img
@@ -98,7 +106,7 @@ const ProductDetail = ({ productId, onAddToCart, goBack }) => {
                 alt={`Foto ${currentSlide + 1}`}
                 onClick={handleOpenModal}
               />
-              <button className="carousel-button" onClick={handleNext}>
+              <button className="carousel-button next" onClick={handleNext}>
                 {">"}
               </button>
             </>
@@ -107,9 +115,10 @@ const ProductDetail = ({ productId, onAddToCart, goBack }) => {
           )}
         </div>
 
-        {/* Información del producto a la derecha */}
         <div className="product-detail__info">
-          <h2 className="product-detail__title">{producto.descripcion}</h2>
+          <h2 className="product-detail__title">
+            {titleCase(producto.descripcion)}
+          </h2>
           <p className="product-detail__price">Precio: Q{producto.precio}</p>
 
           {/* Tallas */}
@@ -184,9 +193,9 @@ const ProductDetail = ({ productId, onAddToCart, goBack }) => {
             <button className="close-button" onClick={handleCloseModal}>
               X
             </button>
-            {/* Reutilizamos el mismo carrusel en el modal */}
+            {/* Carrusel en el modal */}
             <div className="modal-carousel">
-              <button className="carousel-button" onClick={handlePrev}>
+              <button className="carousel-button prev" onClick={handlePrev}>
                 {"<"}
               </button>
               <img
@@ -194,7 +203,7 @@ const ProductDetail = ({ productId, onAddToCart, goBack }) => {
                 src={`data:image/jpeg;base64,${fotos[currentSlide]}`}
                 alt={`Foto grande ${currentSlide + 1}`}
               />
-              <button className="carousel-button" onClick={handleNext}>
+              <button className="carousel-button next" onClick={handleNext}>
                 {">"}
               </button>
             </div>

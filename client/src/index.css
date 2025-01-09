@@ -996,3 +996,228 @@ footer {
     height: 40px;
   }
 }
+.product-detail {
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 1rem;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.product-detail__back-button {
+  background-color: var(--color-border);
+  color: var(--color-text);
+  border: none;
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.product-detail__back-button:hover {
+  background-color: var(--color-primary);
+}
+
+/* Contenedor principal del detalle */
+.product-detail__content {
+  display: flex;
+  gap: 2rem;
+  /* En pantallas grandes, carrusel a la izq + info a la derecha */
+}
+
+/* Carrusel */
+.carousel-infinite {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0; /* para que no se reduzca en móviles */
+}
+
+.carousel-button {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-size: 1.2rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.carousel-button:hover {
+  background-color: var(--color-primary);
+  color: #fff;
+}
+.carousel-button.prev {
+  margin-right: 0.3rem;
+}
+.carousel-button.next {
+  margin-left: 0.3rem;
+}
+.carousel-image {
+  width: 300px;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+}
+
+/* Info producto */
+.product-detail__info {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.product-detail__title {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-primary);
+}
+.product-detail__price {
+  font-weight: bold;
+  color: var(--color-primary);
+  margin-bottom: 1rem;
+}
+
+/* Tallas, colores */
+.selector-label {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #fff; /* o el color de texto */
+}
+.selector-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap; /* para que se acomoden en línea o salten si no cabe */
+}
+.selector-button {
+  background-color: #333;
+  color: #ccc;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+.selector-button:hover {
+  background-color: var(--color-primary);
+  color: #fff;
+}
+.selector-button.active {
+  background-color: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+
+/* Cantidad */
+.quantity-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.quantity-input {
+  width: 60px;
+  padding: 0.3rem;
+  border: 1px solid var(--color-border);
+  background-color: #333;
+  color: #eee;
+  border-radius: 4px;
+}
+
+/* Botón agregar al carrito */
+.add-to-cart-button {
+  background-color: var(--color-primary);
+  color: #fff;
+  border: none;
+  padding: 0.7rem 1rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  margin-top: 1rem;
+  transition: background-color 0.3s ease;
+}
+.add-to-cart-button:hover {
+  background-color: var(--color-primary-hover);
+}
+
+/* Modal overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(20, 20, 20, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+.modal-content {
+  position: relative;
+  background: var(--color-bg-secondary);
+  padding: 1rem;
+  border-radius: 4px;
+  max-width: 80%;
+  max-height: 80%;
+  border: 1px solid var(--color-border);
+}
+
+.close-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background-color: var(--color-border);
+  color: #fff;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  transition: background-color 0.2s ease;
+}
+.close-button:hover {
+  background-color: var(--color-primary);
+}
+
+/* Modal carrusel */
+.modal-carousel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+  justify-content: center;
+}
+.modal-image {
+  max-width: 100%;
+  max-height: 70vh;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+}
+
+/* Responsivo para pantallas medianas */
+@media (max-width: 768px) {
+  .product-detail__content {
+    flex-direction: column; /* Apilamos el carrusel y la info */
+  }
+  .carousel-image {
+    width: 100%;
+    height: auto;
+    max-width: 400px; /* Ajusta a tu gusto */
+  }
+  .quantity-input {
+    width: 50px;
+  }
+}
+
+/* Responsivo para pantallas pequeñas */
+@media (max-width: 480px) {
+  .carousel-image {
+    max-width: 100%;
+  }
+  .product-detail__title {
+    font-size: 1.3rem;
+  }
+  .add-to-cart-button {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.8rem;
+  }
+}

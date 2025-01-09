@@ -12,7 +12,9 @@ const ProductList = ({ onAddToCart }) => {
 
   const fetchProductos = async () => {
     try {
-      const res = await axios.get("https://rubiseduction.shop:4000/api/productos");
+      const res = await axios.get(
+        "https://rubiseduction.shop:4000/api/productos"
+      );
       setProductos(res.data);
     } catch (error) {
       console.error(error);
@@ -23,12 +25,25 @@ const ProductList = ({ onAddToCart }) => {
     navigate(`/detalle/${id}`);
   };
 
+  const titleCase = (str) => {
+    return str
+      .toLowerCase()
+      .split(" ")
+      .map(function (word) {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      })
+      .join(" ");
+  };
+
   return (
     <div className="catalog-grid">
       {productos.map((prod) => {
         // Convertir 'talla' y 'colores' a arrays (S,M,L => ["S","M","L"])
         const tallasArray = prod.talla ? prod.talla.split(",") : [];
         const coloresArray = prod.colores ? prod.colores.split(",") : [];
+
+        tallasArray.sort();
+        coloresArray.sort();
 
         return (
           <div
@@ -46,12 +61,19 @@ const ProductList = ({ onAddToCart }) => {
               alt={prod.descripcion}
             />
 
-            <h3 className="product-title">{prod.descripcion}</h3>
+            <h3 className="product-title">{titleCase(prod.descripcion)}</h3>
             <p className="product-price">Q{prod.precio}</p>
 
             <div style={{ marginTop: "1rem" }}>
               <h4 className="product-subtitle">Tallas:</h4>
-              <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+              <div
+                style={{
+                  display: "flex",
+                  gap: "0.5rem",
+                  flexWrap: "wrap",
+                  justifyContent: "center",
+                }}
+              >
                 {tallasArray.map((talla) => (
                   <button
                     key={talla.trim()}
@@ -71,7 +93,14 @@ const ProductList = ({ onAddToCart }) => {
 
             <div style={{ marginTop: "1rem" }}>
               <h4 className="product-subtitle">Colores:</h4>
-              <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+              <div
+                style={{
+                  display: "flex",
+                  gap: "0.5rem",
+                  flexWrap: "wrap",
+                  justifyContent: "center",
+                }}
+              >
                 {coloresArray.map((color) => (
                   <button
                     key={color.trim()}
