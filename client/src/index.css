@@ -669,7 +669,7 @@ footer {
 .hero-carousel {
   position: relative;
   width: 100%;
-  height: 60vh; /* Ajusta según quieras */
+  height: 75vh; /* Ajusta según quieras */
   overflow: hidden;
   margin-bottom: 2rem;
 }
@@ -729,14 +729,6 @@ footer {
 
 .carousel-button.next {
   right: 1rem;
-}
-
-.hero-carousel {
-  position: relative;
-  width: 100%;
-  height: 60vh; /* Ajusta según desees */
-  overflow: hidden;
-  margin-bottom: 2rem;
 }
 
 .hero-slide {
@@ -1220,4 +1212,34 @@ footer {
     font-size: 0.9rem;
     padding: 0.5rem 0.8rem;
   }
+}
+.catalog-title {
+  font-family: var(--font-heading); /* Ajusta a tu tipografía */
+  text-transform: uppercase;
+  font-size: 2rem;
+  color: var(--color-primary);
+  text-align: center;
+  margin-bottom: 0.5rem;
+  position: relative;
+}
+
+/* Barra o línea decorativa debajo del título */
+.catalog-title::after {
+  content: "";
+  display: block;
+  width: 80px; /* Ajusta largo de la línea */
+  height: 4px; /* Ajusta grosor de la línea */
+  background-color: var(--color-primary-hover);
+  margin: 0.5rem auto 0 auto; /* Centrar la línea */
+  border-radius: 2px;
+}
+
+/* Subtítulo del catálogo */
+.catalog-subtitle {
+  font-size: 1rem;
+  font-family: var(--font-body);
+  color: var(--color-text);
+  text-align: center;
+  margin-bottom: 1.5rem;
+  opacity: 0.8; /* efecto de suavidad */
 }

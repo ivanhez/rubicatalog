@@ -60,6 +60,11 @@ function CatalogPage({ onAddToCart }) {
       </section>
 
       <section className="section" id="catalog-section">
+        <h2 className="catalog-title">Catálogo de Lencería</h2>
+        <p className="catalog-subtitle">
+          La mejor selección para lucir perfecta en toda ocasión
+        </p>
+
         <ProductList onAddToCart={onAddToCart} />
       </section>
     </>
