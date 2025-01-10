@@ -370,12 +370,6 @@ img {
 
 .modal-content {
   position: relative;
-  background: var(--color-bg-secondary);
-  padding: 1rem;
-  border-radius: 4px;
-  max-width: 80%;
-  max-height: 80%;
-  border: 1px solid var(--color-border);
 }
 
 .close-button {
@@ -1146,6 +1140,7 @@ footer {
   justify-content: center;
   z-index: 999;
 }
+
 .modal-content {
   position: relative;
   background: var(--color-bg-secondary);
@@ -1242,4 +1237,97 @@ footer {
   text-align: center;
   margin-bottom: 1.5rem;
   opacity: 0.8; /* efecto de suavidad */
+}
+/* Contenedor del carrusel */
+.carousel-infinite {
+  display: flex;
+  flex-direction: column; /* Apilamos imagen principal y luego thumbnails */
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+}
+
+/* Imagen principal más grande */
+.carousel-image {
+  width: 400px;
+  height: 400px;
+  object-fit: cover;
+  border: 2px solid #444;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Thumbnails */
+.thumbnail-list {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 420px; /* Similar al tamaño principal, para no descuadrar */
+}
+
+.thumbnail-image {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.thumbnail-image:hover {
+  border-color: #a4005b; /* color principal al hover */
+}
+
+.thumbnail-image.active {
+  border-color: #a4005b; /* color principal cuando está activa */
+}
+
+/* Flechas del carrusel (para imagen principal) */
+.carousel-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(36, 36, 36, 0.7);
+  color: #fff;
+  border: none;
+  font-size: 1.5rem;
+  padding: 0.3rem 0.8rem;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.carousel-button:hover {
+  background: rgba(36, 36, 36, 0.9);
+}
+
+/* Ajusta la posición */
+.carousel-button:first-of-type {
+  left: -2rem;
+}
+.carousel-button:last-of-type {
+  right: -2rem;
+}
+
+/* O, si prefieres, ubicar las flechas sobre la imagen */
+.carousel-button.prev {
+  left: 0.5rem;
+}
+.carousel-button.next {
+  right: 0.5rem;
+}
+
+.modal-carousel {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.modal-image {
+  width: 600px;
+  max-height: 80vh;
+  object-fit: cover;
+  border-radius: 4px;
 }

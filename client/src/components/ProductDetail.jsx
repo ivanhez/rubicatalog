@@ -4,7 +4,7 @@ import axios from "axios";
 const ProductDetail = ({ productId, onAddToCart, goBack }) => {
   const [producto, setProducto] = useState(null);
 
-  // Estados para la selección del usuario
+  // Estados para la selección (sin preselección)
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [quantity, setQuantity] = useState(1);
@@ -32,7 +32,7 @@ const ProductDetail = ({ productId, onAddToCart, goBack }) => {
     }
   }, [productId]);
 
-  // Reiniciar quantity y currentSlide cuando se actualiza `producto`
+  // Solo quantity y currentSlide:
   useEffect(() => {
     if (producto) {
       setQuantity(1);
@@ -86,6 +86,11 @@ const ProductDetail = ({ productId, onAddToCart, goBack }) => {
       .join(" ");
   };
 
+  // Elegir miniatura
+  const handleThumbnailClick = (index) => {
+    setCurrentSlide(index);
+  };
+
   return (
     <div className="product-detail">
       <button className="product-detail__back-button" onClick={goBack}>
@@ -100,6 +105,7 @@ const ProductDetail = ({ productId, onAddToCart, goBack }) => {
               <button className="carousel-button prev" onClick={handlePrev}>
                 {"<"}
               </button>
+              {/* Imagen principal (más grande) */}
               <img
                 className="carousel-image"
                 src={`data:image/jpeg;base64,${fotos[currentSlide]}`}
@@ -112,6 +118,23 @@ const ProductDetail = ({ productId, onAddToCart, goBack }) => {
             </>
           ) : (
             <p>No hay imágenes disponibles.</p>
+          )}
+
+          {/* Thumbnails debajo */}
+          {fotos.length > 1 && (
+            <div className="thumbnail-list">
+              {fotos.map((foto, i) => (
+                <img
+                  key={i}
+                  className={`thumbnail-image ${
+                    i === currentSlide ? "active" : ""
+                  }`}
+                  src={`data:image/jpeg;base64,${foto}`}
+                  alt={`Miniatura ${i + 1}`}
+                  onClick={() => handleThumbnailClick(i)}
+                />
+              ))}
+            </div>
           )}
         </div>
 

@@ -44,7 +44,7 @@ function CatalogPage({ onAddToCart }) {
             <div className="hero-overlay" />
 
             <div className="hero-content">
-              <h1>Descubre nuestra nueva colección de inicio de año</h1>
+              <h1>Descubre nuestra nueva colección San Valentín</h1>
               <p>Sensualidad y elegancia en cada prenda</p>
             </div>
 
