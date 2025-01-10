@@ -43,9 +43,12 @@ function App() {
   /** Login */
   const handleLogin = async (password) => {
     try {
-      const res = await axios.post("https://rubiseduction.shop:4000/api/login", {
-        password,
-      });
+      const res = await axios.post(
+        "https://rubiseduction.shop:4000/api/login",
+        {
+          password,
+        }
+      );
       if (res.data.token) {
         localStorage.setItem("token", res.data.token);
         setIsAdminLogged(true);
@@ -160,11 +163,14 @@ function App() {
         <div className="footer-content">
           <div className="footer-col">
             <h3>Sobre Nosotros</h3>
-            {/* <p>Tu tienda de lencería de confianza.</p> */}
+            <p>Lencería para seducir 🌹</p>
+            <p>Contamos con lencería y todo tipo de ropa interior para dama</p>
           </div>
           <div className="footer-col">
             <h3>Contacto</h3>
-            {/* <p>Email: info@mitienda.com</p> */}
+            <a href="https://api.whatsapp.com/send?phone=50231383430">
+              Whatsapp: 3138-3430
+            </a>
           </div>
         </div>
       </footer>
