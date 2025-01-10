@@ -1398,3 +1398,140 @@ footer {
 .page-button.active {
   background-color: #a4005b; /* tu color principal */
 }
+/* Carrito contenedor */
+.cart {
+  background-color: #242424;
+  padding: 1rem;
+  border-radius: 5px;
+  border: 1px solid #444;
+  margin-bottom: 2rem;
+}
+
+/* Título del carrito */
+.cart-title {
+  font-family: var(--font-heading);
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: var(--color-primary);
+}
+
+/* Mensaje cuando está vacío */
+.cart-empty {
+  font-size: 1rem;
+  color: #999;
+  text-align: center;
+}
+
+/* Botón "Seguir comprando" */
+.cart-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.btn-continue {
+  background-color: #2980b9;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-right: 1rem;
+  transition: background-color 0.3s ease;
+}
+.btn-continue:hover {
+  background-color: #1e6fa5;
+}
+
+/* Tabla del carrito */
+.cart-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+  background: #2b2b2b;
+}
+
+.cart-table th,
+.cart-table td {
+  border: 1px solid #444;
+  padding: 0.5rem;
+  text-align: center;
+  color: #fff;
+  vertical-align: middle;
+}
+
+.cart-table th {
+  background-color: #333;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.cart-item:hover {
+  background-color: #2e2e2e;
+}
+
+/* Botón eliminar */
+.cart-remove-button {
+  background-color: #e74c3c;
+  color: #fff;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.cart-remove-button:hover {
+  background-color: #c0392b;
+}
+
+/* Botón confirmar */
+.cart-confirm-button {
+  background-color: var(--color-primary);
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+}
+.cart-confirm-button:hover {
+  background-color: var(--color-primary-hover);
+}
+
+/* Responsividad en móviles */
+@media (max-width: 600px) {
+  /* Ocultar cabecera y estilo distinto en filas */
+  .cart-table thead {
+    display: none;
+  }
+
+  .cart-table tr {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+    border: 1px solid #444;
+  }
+
+  .cart-table td {
+    border: none;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    padding: 0.3rem 0.5rem;
+  }
+
+  .cart-table td::before {
+    /* Texto identificativo (contenido de la cabecera) */
+    color: #999;
+    font-weight: 600;
+    content: attr(data-label);
+    margin-right: 0.5rem;
+  }
+
+  /* Ajustar colSpan */
+  .cart-table tfoot {
+    display: none; /* Podrías mostrarlo de otra forma */
+  }
+}

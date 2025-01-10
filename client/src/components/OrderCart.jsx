@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 const OrderCart = ({ cart, setCart }) => {
   const navigate = useNavigate();
 
+  // Confirmar pedido
   const handleConfirmOrder = async () => {
     if (cart.length === 0) return;
 
@@ -24,19 +25,14 @@ const OrderCart = ({ cart, setCart }) => {
 
     try {
       // 3. Crear el pedido en tu backend
-      const res = await axios.post("https://rubiseduction.shop:4000/api/pedidos", {
-        productos: productosPedido,
-      });
+      const res = await axios.post(
+        "https://rubiseduction.shop:4000/api/pedidos",
+        {
+          productos: productosPedido,
+        }
+      );
 
-      // 4. Preparar el texto con el detalle completo del carrito
-      /*
-        Ejemplo de mensaje:
-        "Detalles de mi pedido:
-         1) Conjunto Encaje, Talla: M, Color: Negro, Cantidad: 2
-         2) Body Rojo, Talla: S, Color: Rojo, Cantidad: 1
-         Total: Q120
-         ID Pedido: 12345"
-      */
+      // 4. Preparar texto para WhatsApp
       let mensaje = "Detalles de mi pedido:\n";
       cart.forEach((item, i) => {
         mensaje += `${i + 1}) ${item.descripcion}, Talla: ${
@@ -44,9 +40,9 @@ const OrderCart = ({ cart, setCart }) => {
         }, Color: ${item.color}, Cantidad: ${item.cantidad}\n`;
       });
       mensaje += `\nTotal: Q${total}\n`;
-    //   mensaje += `ID Pedido: ${res.data.pedidoId}`;
+      // mensaje += `ID Pedido: ${res.data.pedidoId}`;
 
-      // 5. Abrir WhatsApp Web/Móvil con el mensaje
+      // 5. Abrir WhatsApp
       const phoneNumber = "50231383430"; // Reemplaza con tu número (código de país)
       const waUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
         mensaje
@@ -61,11 +57,12 @@ const OrderCart = ({ cart, setCart }) => {
     }
   };
 
+  // Eliminar un ítem del carrito
   const removeItem = (index) => {
     setCart(cart.filter((_, i) => i !== index));
   };
 
-  // Calcular total también para mostrarlo en la interfaz
+  // Calcular total para mostrar en la interfaz
   let total = 0;
   cart.forEach((item) => {
     total += item.precio * item.cantidad;
@@ -79,10 +76,17 @@ const OrderCart = ({ cart, setCart }) => {
         <p className="cart-empty">No hay productos en el carrito.</p>
       ) : (
         <>
+          {/* Botón para regresar al catálogo */}
+          <div className="cart-actions">
+            <button className="btn-continue" onClick={() => navigate("/")}>
+              Seguir comprando
+            </button>
+          </div>
+
           <table className="table cart-table">
             <thead>
               <tr>
-                <th>Foto</th>
+                {/* Sin la columna Foto */}
                 <th>Producto</th>
                 <th>Talla</th>
                 <th>Color</th>
@@ -98,31 +102,18 @@ const OrderCart = ({ cart, setCart }) => {
                 return (
                   <tr key={index} className="cart-item">
                     <td
-                      style={{ cursor: "pointer" }}
+                      data-label="Producto"
                       onClick={() => navigate(`/detalle/${item.id}`)}
-                    >
-                      <img
-                        className="cart-image"
-                        src={
-                          item.fotos && item.fotos.length > 0
-                            ? `data:image/jpeg;base64,${item.fotos[0]}`
-                            : "https://via.placeholder.com/80?text=No+Image"
-                        }
-                        alt={item.descripcion}
-                      />
-                    </td>
-                    <td
-                      style={{ cursor: "pointer" }}
-                      onClick={() => navigate(`/detalle/${item.id}`)}
+                      style={{ cursor: "pointer", color: "#1e90ff" }}
                     >
                       <strong>{item.descripcion}</strong>
                     </td>
-                    <td>{item.talla}</td>
-                    <td>{item.color}</td>
-                    <td>{item.cantidad}</td>
-                    <td>Q{item.precio}</td>
-                    <td>Q{subTotal}</td>
-                    <td>
+                    <td data-label="Talla">{item.talla}</td>
+                    <td data-label="Color">{item.color}</td>
+                    <td data-label="Cantidad">{item.cantidad}</td>
+                    <td data-label="Precio Unitario">Q{item.precio}</td>
+                    <td data-label="Subtotal">Q{subTotal}</td>
+                    <td data-label="Acciones">
                       <button
                         className="cart-remove-button"
                         onClick={() => removeItem(index)}
@@ -134,10 +125,11 @@ const OrderCart = ({ cart, setCart }) => {
                 );
               })}
             </tbody>
+
             <tfoot>
               <tr>
                 <td
-                  colSpan="7"
+                  colSpan="6"
                   style={{ textAlign: "right", fontWeight: "bold" }}
                 >
                   Total: Q{total}
