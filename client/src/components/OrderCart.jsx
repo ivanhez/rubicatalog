@@ -17,7 +17,7 @@ const OrderCart = ({ cart, setCart }) => {
       color: item.color,
     }));
 
-    // 2. Calcular el total
+    // 2. Calcular el total general
     let total = 0;
     cart.forEach((item) => {
       total += item.precio * item.cantidad;
@@ -32,15 +32,19 @@ const OrderCart = ({ cart, setCart }) => {
         }
       );
 
-      // 4. Preparar texto para WhatsApp
+      // 4. Preparar texto para WhatsApp con subtotales
       let mensaje = "Detalles de mi pedido:\n";
       cart.forEach((item, i) => {
+        const subTotal = item.precio * item.cantidad;
         mensaje += `${i + 1}) ${item.descripcion}, Talla: ${
           item.talla
-        }, Color: ${item.color}, Cantidad: ${item.cantidad}\n`;
+        }, Color: ${item.color}, Cantidad: ${
+          item.cantidad
+        }, Subtotal: Q${subTotal}\n`;
       });
       mensaje += `\nTotal: Q${total}\n`;
-      // mensaje += `ID Pedido: ${res.data.pedidoId}`;
+      // Si quieres usar el ID del pedido:
+      // mensaje += `ID Pedido: ${res.data.pedidoId}\n`;
 
       // 5. Abrir WhatsApp
       const phoneNumber = "50231383430"; // Reemplaza con tu número (código de país)
@@ -49,8 +53,8 @@ const OrderCart = ({ cart, setCart }) => {
       )}`;
       window.open(waUrl, "_blank");
 
-      // 6. Vaciar carrito
-      setCart([]);
+      // 6. **No** vaciamos el carrito (removimos setCart([]))
+      // setCart([]);
     } catch (error) {
       console.error(error);
       alert("Error al crear el pedido");
@@ -86,7 +90,6 @@ const OrderCart = ({ cart, setCart }) => {
           <table className="table cart-table">
             <thead>
               <tr>
-                {/* Sin la columna Foto */}
                 <th>Producto</th>
                 <th>Talla</th>
                 <th>Color</th>
