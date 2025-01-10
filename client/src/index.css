@@ -1530,8 +1530,5 @@ footer {
     margin-right: 0.5rem;
   }
 
-  /* Ajustar colSpan */
-  .cart-table tfoot {
-    display: none; /* Podrías mostrarlo de otra forma */
-  }
+  
 }
