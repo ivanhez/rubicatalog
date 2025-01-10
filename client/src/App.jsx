@@ -168,12 +168,16 @@ function App() {
           </div>
           <div className="footer-col">
             <h3>Contacto</h3>
-            <a href="https://www.instagram.com/rubiseductiongt/">
-              Instagram: @rubiseduction
-            </a>
-            <a href="https://api.whatsapp.com/send?phone=50231383430">
-              Whatsapp: 3138-3430
-            </a>
+            <p>
+              <a href="https://www.instagram.com/rubiseductiongt/">
+                Instagram: @rubiseduction
+              </a>
+            </p>
+            <p>
+              <a href="https://api.whatsapp.com/send?phone=50231383430">
+                Whatsapp: 3138-3430
+              </a>
+            </p>
           </div>
         </div>
       </footer>
