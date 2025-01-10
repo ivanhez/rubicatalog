@@ -2,6 +2,51 @@ import React from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+// Tabla de descuentos para 3 productos de cierto precio
+const discountMapping = {
+  25: 70,
+  30: 75,
+  60: 175,
+  65: 190,
+};
+
+/**
+ * Calcula el total con la regla de "3 productos" de cierto precio => precio especial.
+ * @param {Array} cart - Array de productos ( { precio, cantidad, ... } )
+ * @returns {number} total con descuento.
+ */
+function calculateTotalWithDiscount(cart) {
+  const priceMap = {};
+
+  cart.forEach((item) => {
+    const price = item.precio;
+    if (!priceMap[price]) {
+      priceMap[price] = 0;
+    }
+    priceMap[price] += item.cantidad;
+  });
+
+  let total = 0;
+
+  for (let priceStr in priceMap) {
+    const price = Number(priceStr);
+    const count = priceMap[priceStr];
+
+    if (discountMapping[price]) {
+      const groupsOf3 = Math.floor(count / 3);
+      const remainder = count % 3;
+      const discountedPriceFor3 = discountMapping[price];
+
+      total += groupsOf3 * discountedPriceFor3;
+      total += remainder * price;
+    } else {
+      total += price * count;
+    }
+  }
+
+  return total;
+}
+
 const OrderCart = ({ cart, setCart }) => {
   const navigate = useNavigate();
 
@@ -17,14 +62,8 @@ const OrderCart = ({ cart, setCart }) => {
       color: item.color,
     }));
 
-    // 2. Calcular el total general
-    let total = 0;
-    cart.forEach((item) => {
-      total += item.precio * item.cantidad;
-    });
-
     try {
-      // 3. Crear el pedido en tu backend
+      // 2. Crear el pedido en tu backend
       const res = await axios.post(
         "https://rubiseduction.shop:4000/api/pedidos",
         {
@@ -32,28 +71,30 @@ const OrderCart = ({ cart, setCart }) => {
         }
       );
 
+      // 3. Calcular total con descuentos
+      const totalConDescuento = calculateTotalWithDiscount(cart);
+
       // 4. Preparar texto para WhatsApp con subtotales
       let mensaje = "Detalles de mi pedido:\n";
       cart.forEach((item, i) => {
-        const subTotal = item.precio * item.cantidad;
+        const subTotalNormal = item.precio * item.cantidad;
         mensaje += `${i + 1}) ${item.descripcion}, Talla: ${
           item.talla
         }, Color: ${item.color}, Cantidad: ${
           item.cantidad
-        }, Subtotal: Q${subTotal}\n`;
+        }, Subtotal sin desc: Q${subTotalNormal}\n`;
       });
-      mensaje += `\nTotal: Q${total}\n`;
-      // Si quieres usar el ID del pedido:
+      mensaje += `\nTotal con Descuento: Q${totalConDescuento}\n`;
       // mensaje += `ID Pedido: ${res.data.pedidoId}\n`;
 
       // 5. Abrir WhatsApp
-      const phoneNumber = "50231383430"; // Reemplaza con tu número (código de país)
+      const phoneNumber = "50231383430"; // Reemplaza con tu número
       const waUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
         mensaje
       )}`;
       window.open(waUrl, "_blank");
 
-      // 6. **No** vaciamos el carrito (removimos setCart([]))
+      // 6. No vaciamos el carrito
       // setCart([]);
     } catch (error) {
       console.error(error);
@@ -66,11 +107,8 @@ const OrderCart = ({ cart, setCart }) => {
     setCart(cart.filter((_, i) => i !== index));
   };
 
-  // Calcular total para mostrar en la interfaz
-  let total = 0;
-  cart.forEach((item) => {
-    total += item.precio * item.cantidad;
-  });
+  // Calcular total con descuento para mostrar en la interfaz
+  const totalConDescuento = calculateTotalWithDiscount(cart);
 
   return (
     <div className="cart">
@@ -135,7 +173,7 @@ const OrderCart = ({ cart, setCart }) => {
                   colSpan="6"
                   style={{ textAlign: "right", fontWeight: "bold" }}
                 >
-                  Total: Q{total}
+                  Total con Descuento: Q{totalConDescuento}
                 </td>
               </tr>
             </tfoot>
