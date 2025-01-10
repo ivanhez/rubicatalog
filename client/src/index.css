@@ -1331,3 +1331,70 @@ footer {
   object-fit: cover;
   border-radius: 4px;
 }
+.btn-show-more {
+  background-color: #a4005b; /* tu color principal */
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.btn-show-more:hover {
+  background-color: #8b004d;
+}
+.pagination-container {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.pagination-button {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid #aaa;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.pagination-button.active {
+  background-color: #a4005b;
+  color: #fff;
+  border-color: #a4005b;
+}
+
+.pagination-button:hover:not(.active) {
+  background-color: #f2f2f2;
+}
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.page-button {
+  background-color: #444;
+  color: #fff;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.page-button:hover:not(:disabled) {
+  background-color: #666;
+}
+
+.page-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.page-button.active {
+  background-color: #a4005b; /* tu color principal */
+}
