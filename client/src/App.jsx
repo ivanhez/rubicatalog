@@ -170,7 +170,7 @@ function App() {
             <h3>Contacto</h3>
             <p>
               <a href="https://www.instagram.com/rubiseductiongt/">
-                Instagram: @rubiseduction
+                Instagram: @rubiseductiongt
               </a>
             </p>
             <p>
