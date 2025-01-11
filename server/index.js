@@ -10,6 +10,7 @@ dotenv.config();
 import authRoutes from "./routes/authRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import inventoryRoutes from "./routes/inventoryRoutes.js"; // nuevo inventario
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use("/api/login", authRoutes);
 app.use("/api/productos", productRoutes);
 app.use("/api/pedidos", orderRoutes);
+app.use("/api/inventario", inventoryRoutes);
 
 // Cargar los certificados (reemplaza las rutas según tus archivos)
 const privateKey = fs.readFileSync("private.key");
