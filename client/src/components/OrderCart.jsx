@@ -110,6 +110,14 @@ const OrderCart = ({ cart, setCart }) => {
   // Calcular total con descuento para mostrar en la interfaz
   const totalConDescuento = calculateTotalWithDiscount(cart);
 
+  const titleCase = (str) => {
+    return str
+      .toLowerCase()
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
   return (
     <div className="cart">
       <h2 className="cart-title">Carrito</h2>
@@ -147,7 +155,7 @@ const OrderCart = ({ cart, setCart }) => {
                       onClick={() => navigate(`/detalle/${item.id}`)}
                       style={{ cursor: "pointer", color: "#1e90ff" }}
                     >
-                      <strong>{item.descripcion}</strong>
+                      <strong>{titleCase(item.descripcion)}</strong>
                     </td>
                     <td data-label="Talla">{item.talla}</td>
                     <td data-label="Color">{item.color}</td>

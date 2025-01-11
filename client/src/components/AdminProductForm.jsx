@@ -10,6 +10,7 @@ const AdminProductForm = () => {
     colores: "",
     precio: "",
     fotos: [],
+    codigo: "",
   });
 
   useEffect(() => {
@@ -71,6 +72,7 @@ const AdminProductForm = () => {
         colores: form.colores,
         precio: form.precio,
         fotos: form.fotos,
+        codigo: form.codigo,
       });
 
       alert("Producto creado exitosamente.");
@@ -93,6 +95,7 @@ const AdminProductForm = () => {
       colores: prod.colores,
       precio: prod.precio,
       fotos: prod.fotos || [],
+      codigo: prod.codigo,
     });
     // Podrías hacer scroll al formulario (opcional)
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -114,6 +117,7 @@ const AdminProductForm = () => {
           colores: form.colores,
           precio: form.precio,
           fotos: form.fotos,
+          codigo: form.codigo,
         }
       );
 
@@ -154,6 +158,7 @@ const AdminProductForm = () => {
       colores: "",
       precio: "",
       fotos: [],
+      codigo: "",
     });
   };
 
@@ -162,6 +167,16 @@ const AdminProductForm = () => {
       <h2>Administrar Productos</h2>
 
       <form onSubmit={handleCreate} className="admin-form">
+        <div className="form-group">
+          <label>Codigo:</label>
+          <input
+            type="text"
+            name="codigo"
+            value={form.codigo}
+            onChange={handleChange}
+            required
+          />
+        </div>
         <div className="form-group">
           <label>Descripción:</label>
           <input
@@ -250,6 +265,7 @@ const AdminProductForm = () => {
         <thead>
           <tr>
             <th>ID</th>
+            <th>codigo</th>
             <th>Descripción</th>
             <th>Talla</th>
             <th>Colores</th>
@@ -262,6 +278,7 @@ const AdminProductForm = () => {
           {productos.map((prod) => (
             <tr key={prod.id}>
               <td>{prod.id}</td>
+              <td>{prod.codigo}</td>
               <td>{prod.descripcion}</td>
               <td>{prod.talla}</td>
               <td>{prod.colores}</td>

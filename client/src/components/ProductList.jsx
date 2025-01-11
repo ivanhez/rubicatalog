@@ -144,7 +144,7 @@ const ProductList = () => {
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
           >
-            Prev
+            ←
           </button>
 
           {/* Números de página */}
@@ -164,7 +164,7 @@ const ProductList = () => {
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
           >
-            Next
+            →
           </button>
         </div>
       )}
