@@ -9,14 +9,7 @@ import DetailPage from "./pages/DetailPage";
 import CartPage from "./pages/CartPage";
 import LoginPage from "./pages/LoginPage";
 import AdminPage from "./pages/AdminPage";
-
-// Importar componentes (o podrías importarlos dentro de las páginas)
-import ProductList from "./components/ProductList";
-import ProductDetail from "./components/ProductDetail";
-import AdminProductForm from "./components/AdminProductForm";
-import OrderCart from "./components/OrderCart";
-import Login from "./components/Login";
-
+import InventoryPage from "./pages/InventoryPage";
 /** Ruta protegida básica */
 function ProtectedRoute({ isAdmin, children }) {
   if (!isAdmin) {
@@ -110,7 +103,10 @@ function App() {
             <></>
           ) : (
             <>
-              <button onClick={() => navigate("/admin")}>Administración</button>
+              <button onClick={() => navigate("/admin")}>Productos</button>
+              <button onClick={() => navigate("/inventario")}>
+                Inventario
+              </button>
               <button onClick={handleLogout}>Cerrar Sesión</button>
             </>
           )}
@@ -143,6 +139,14 @@ function App() {
           element={
             <ProtectedRoute isAdmin={isAdminLogged}>
               <AdminPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/inventario"
+          element={
+            <ProtectedRoute isAdmin={isAdminLogged}>
+              <InventoryPage></InventoryPage>
             </ProtectedRoute>
           }
         />

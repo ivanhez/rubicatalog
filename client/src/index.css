@@ -1592,3 +1592,207 @@ footer {
   font-weight: 600;
   font-size: 0.95rem;
 }
+.inventory-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* Filtro y buscador */
+.filter-section {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  align-items: center;
+}
+.search-input {
+  flex: 1;
+  padding: 0.5rem;
+}
+.filter-select {
+  padding: 0.5rem;
+}
+
+/* Tabla responsive */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.inventory-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.inventory-table th,
+.inventory-table td {
+  border: 1px solid #000000;
+  padding: 0.5rem;
+}
+.inventory-table th {
+  background-color: #000000;
+  cursor: pointer;
+}
+.inventory-table tr:hover {
+  background-color: #000000;
+}
+
+/* Móvil: convertir la tabla en filas flex */
+@media (max-width: 600px) {
+  .inventory-table thead {
+    display: none;
+  }
+  .inventory-table,
+  .inventory-table tbody,
+  .inventory-table tr,
+  .inventory-table td {
+    display: block;
+    width: 100%;
+  }
+  .inventory-table tr {
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+  }
+  .inventory-table td {
+    text-align: right;
+    padding-left: 50%;
+    position: relative;
+  }
+  .inventory-table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 1rem;
+    text-align: left;
+    font-weight: bold;
+  }
+}
+.inventory-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.inventory-container h1 {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+/* FORM DE CREACIÓN */
+.inventory-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 5px;
+  margin-bottom: 1rem;
+}
+.inventory-form .form-group {
+  display: flex;
+  flex-direction: column;
+}
+.inventory-form .form-group label {
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+.inventory-form .form-group input {
+  padding: 0.4rem;
+  border-radius: 4px;
+}
+.inventory-form .form-actions {
+  grid-column: 1 / -1;
+  margin-top: 0.5rem;
+}
+.btn-primary {
+  padding: 0.5rem 1rem;
+  background-color: #a4005b;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.btn-primary:hover {
+  background-color: #8b004d;
+}
+
+/* FILTRO */
+.filter-section {
+  margin-bottom: 1rem;
+  display: flex;
+  gap: 1rem;
+}
+.search-input {
+  flex: 1;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+/* TABLA */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto; /* scroll horizontal si es necesario */
+}
+.inventory-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.inventory-table th,
+.inventory-table td {
+  padding: 0.5rem;
+  text-align: left;
+}
+.inventory-table th {
+  cursor: pointer;
+  user-select: none;
+}
+
+
+/* BOTONES DE ÍCONO */
+.icon-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-right: 0.3rem;
+  font-size: 1.1rem;
+  color: #e4e4e4;
+  transition: color 0.2s;
+  margin-right: 1rem;
+}
+.icon-button:hover {
+  color: #a4005b;
+}
+.icon-button:focus {
+  outline: 2px solid #a4005b;
+  outline-offset: 2px;
+}
+
+/* RESPONSIVO (MÓVIL) */
+@media (max-width: 600px) {
+  .inventory-form {
+    grid-template-columns: 1fr;
+  }
+
+  .inventory-table thead {
+    display: none;
+  }
+  .inventory-table,
+  .inventory-table tbody,
+  .inventory-table tr,
+  .inventory-table td {
+    display: block;
+    width: 100%;
+  }
+  .inventory-table tr {
+    margin-bottom: 1rem;
+  }
+  .inventory-table td {
+    position: relative;
+    padding-left: 50%;
+    text-align: left;
+    border: none;
+  }
+  .inventory-table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 1rem;
+    font-weight: bold;
+    color: #666;
+  }
+}
