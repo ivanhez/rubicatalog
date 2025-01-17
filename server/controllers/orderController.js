@@ -1,53 +1,28 @@
-import { pool } from "../config/db.js";
+// controllers/orderController.js
+import { Order } from "../models/Order.js";
 
+/**
+ * Crear un pedido
+ */
 export const createOrder = async (req, res) => {
   try {
-    const { productos } = req.body;
-    /*
-      productos => [
-        { id: 1, cantidad: 2, talla: "M", color: "Rojo" },
-        { id: 2, cantidad: 3, talla: "S", color: "Azul" },
-        ...
-      ]
-    */
+    // datos en req.body => { estado, total, items: [{ productId, cantidad, talla, color, precioUnitario, subtotal }] }
+    const { estado, total, items } = req.body;
 
-    // 1. Crear registro en la tabla 'pedidos'
-    const [orderResult] = await pool.query(
-      "INSERT INTO pedidos (estado) VALUES (?)",
-      ["pendiente"]
-    );
-    const pedidoId = orderResult.insertId;
-
-    let total = 0;
-
-    // 2. Insertar detalles en 'pedidos_detalles'
-    for (let producto of productos) {
-      const { id, cantidad, talla, color } = producto;
-      // Obtener precio del producto
-      const [rows] = await pool.query(
-        "SELECT precio FROM productos WHERE id = ?",
-        [id]
-      );
-      const precioUnitario = rows[0].precio || 0;
-      const subtotal = precioUnitario * cantidad;
-      total += subtotal;
-
-      // Insertar detalle con talla y color
-      await pool.query(
-        "INSERT INTO pedidos_detalles (pedido_id, producto_id, cantidad, talla, color) VALUES (?, ?, ?, ?, ?)",
-        [pedidoId, id, cantidad, talla, color]
-      );
-    }
-
-    // 3. Actualizar el total en la tabla 'pedidos'
-    await pool.query("UPDATE pedidos SET total = ? WHERE id = ?", [
+    // Crear la instancia del modelo
+    const newOrder = new Order({
+      estado,
       total,
-      pedidoId,
-    ]);
+      items
+    });
 
-    res.json({ message: "Pedido creado correctamente", pedidoId, total });
+    // Guardar en la base de datos
+    const savedOrder = await newOrder.save();
+
+    // Devolver la respuesta
+    res.json(savedOrder);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: error.message });
+    console.error("Error al crear pedido:", error);
+    return res.status(500).json({ error: "Error al crear el pedido" });
   }
 };

@@ -1,11 +1,13 @@
-import { pool } from "../config/db.js";
+// controllers/inventoryController.js
+import { Inventory } from "../models/Inventory.js";
 
 /**
  * Obtener todo el inventario
  */
 export const getAllInventory = async (req, res) => {
   try {
-    const [rows] = await pool.query("SELECT * FROM inventario");
+    // Devuelve todos los documentos
+    const rows = await Inventory.find();
     res.json(rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -18,15 +20,13 @@ export const getAllInventory = async (req, res) => {
 export const getInventoryById = async (req, res) => {
   try {
     const { id } = req.params;
-    const [rows] = await pool.query("SELECT * FROM inventario WHERE id = ?", [
-      id,
-    ]);
-    if (rows.length === 0) {
+    const doc = await Inventory.findById(id);
+    if (!doc) {
       return res
         .status(404)
         .json({ message: "Registro de inventario no encontrado" });
     }
-    res.json(rows[0]);
+    res.json(doc);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -38,37 +38,35 @@ export const getInventoryById = async (req, res) => {
 export const getInventoryByCodigo = async (req, res) => {
   try {
     const { codigo } = req.params;
-    const [rows] = await pool.query("SELECT * FROM inventario WHERE codigo = ?", [
-      codigo,
-    ]);
+    // Si tu lógica es "todos los items que tengan ese código"
+    // => find({ codigo })
+    const rows = await Inventory.find({ codigo: codigo });
     if (rows.length === 0) {
       return res
         .status(404)
-        .json({ message: "Codigo de inventario no encontrado" });
+        .json({ message: "Código de inventario no encontrado" });
     }
     res.json(rows);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
 /**
  * Crear un registro de inventario
  */
 export const createInventory = async (req, res) => {
   try {
     const { descripcion, color, talla, cantidad, codigo } = req.body;
-    const [result] = await pool.query(
-      "INSERT INTO inventario (descripcion, color, talla, cantidad, codigo) VALUES (?, ?, ?, ?, ?)",
-      [descripcion, color, talla, cantidad, codigo]
-    );
-    res.json({
-      id: result.insertId,
+    const newItem = new Inventory({
       descripcion,
       color,
       talla,
       cantidad,
       codigo,
     });
+    const saved = await newItem.save();
+    res.json(saved);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -82,16 +80,22 @@ export const updateInventory = async (req, res) => {
     const { id } = req.params;
     const { descripcion, color, talla, cantidad, codigo } = req.body;
 
-    const [result] = await pool.query(
-      "UPDATE inventario SET descripcion=?, color=?, talla=?, cantidad=?, codigo=? WHERE id=?",
-      [descripcion, color, talla, cantidad, codigo, id]
+    // { new: true } => retorna el documento actualizado
+    const updated = await Inventory.findByIdAndUpdate(
+      id,
+      { descripcion, color, talla, cantidad, codigo },
+      { new: true }
     );
-    if (result.affectedRows === 0) {
+
+    if (!updated) {
       return res
         .status(404)
         .json({ message: "Registro de inventario no encontrado" });
     }
-    res.json({ message: "Registro de inventario actualizado correctamente" });
+    res.json({
+      message: "Registro de inventario actualizado correctamente",
+      updated,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -103,10 +107,8 @@ export const updateInventory = async (req, res) => {
 export const deleteInventory = async (req, res) => {
   try {
     const { id } = req.params;
-    const [result] = await pool.query("DELETE FROM inventario WHERE id = ?", [
-      id,
-    ]);
-    if (result.affectedRows === 0) {
+    const removed = await Inventory.findByIdAndDelete(id);
+    if (!removed) {
       return res
         .status(404)
         .json({ message: "Registro de inventario no encontrado" });

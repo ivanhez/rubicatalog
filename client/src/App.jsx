@@ -71,7 +71,7 @@ function App() {
     // itemData => {id, descripcion, precio, talla, color, cantidad}
     const existing = cart.find(
       (p) =>
-        p.id === itemData.id &&
+        p._id === itemData.id &&
         p.talla === itemData.talla &&
         p.color === itemData.color
     );

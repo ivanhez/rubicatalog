@@ -55,8 +55,9 @@ const OrderCart = ({ cart, setCart }) => {
     if (cart.length === 0) return;
 
     // 1. Construir array para enviar al backend
+    // Si el backend ahora espera _id:
     const productosPedido = cart.map((item) => ({
-      id: item.id,
+      _id: item._id,
       cantidad: item.cantidad,
       talla: item.talla,
       color: item.color,
@@ -64,12 +65,12 @@ const OrderCart = ({ cart, setCart }) => {
 
     try {
       // 2. Crear el pedido en tu backend
-      const res = await axios.post(
-        "https://rubiseduction.shop:4000/api/pedidos",
-        {
-          productos: productosPedido,
-        }
-      );
+      // const res = await axios.post(
+      //   "https://rubiseduction.shop:4000/api/pedidos",
+      //   {
+      //     productos: productosPedido,
+      //   }
+      // );
 
       // 3. Calcular total con descuentos
       const totalConDescuento = calculateTotalWithDiscount(cart);
@@ -85,7 +86,6 @@ const OrderCart = ({ cart, setCart }) => {
         }, Subtotal sin desc: Q${subTotalNormal}\n`;
       });
       mensaje += `\nTotal con Descuento: Q${totalConDescuento}\n`;
-      // mensaje += `ID Pedido: ${res.data.pedidoId}\n`;
 
       // 5. Abrir WhatsApp
       const phoneNumber = "50231383430"; // Reemplaza con tu número
@@ -94,7 +94,7 @@ const OrderCart = ({ cart, setCart }) => {
       )}`;
       window.open(waUrl, "_blank");
 
-      // 6. No vaciamos el carrito
+      // 6. No vaciamos el carrito (si así lo deseas)
       // setCart([]);
     } catch (error) {
       console.error(error);
@@ -110,6 +110,7 @@ const OrderCart = ({ cart, setCart }) => {
   // Calcular total con descuento para mostrar en la interfaz
   const totalConDescuento = calculateTotalWithDiscount(cart);
 
+  // Helper para capitalizar texto
   const titleCase = (str) => {
     return str
       .toLowerCase()
@@ -152,7 +153,7 @@ const OrderCart = ({ cart, setCart }) => {
                   <tr key={index} className="cart-item">
                     <td
                       data-label="Producto"
-                      onClick={() => navigate(`/detalle/${item.id}`)}
+                      onClick={() => navigate(`/detalle/${item._id}`)}
                       style={{ cursor: "pointer", color: "#1e90ff" }}
                     >
                       <strong>{titleCase(item.descripcion)}</strong>

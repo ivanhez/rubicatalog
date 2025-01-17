@@ -19,9 +19,7 @@ const AdminProductForm = () => {
 
   const fetchProductos = async () => {
     try {
-      const res = await axios.get(
-        "https://rubiseduction.shop:4000/api/productos"
-      );
+      const res = await axios.get("https://rubiseduction.shop:4000/api/productos");
       setProductos(res.data);
     } catch (error) {
       console.error(error);
@@ -89,7 +87,7 @@ const AdminProductForm = () => {
    */
   const handleSelectProduct = (prod) => {
     setForm({
-      id: prod.id,
+      id: prod._id, // Usamos _id en lugar de id
       descripcion: prod.descripcion,
       talla: prod.talla,
       colores: prod.colores,
@@ -97,7 +95,7 @@ const AdminProductForm = () => {
       fotos: prod.fotos || [],
       codigo: prod.codigo,
     });
-    // Podrías hacer scroll al formulario (opcional)
+    // Desplazar scroll hacia el form (opcional)
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -109,17 +107,15 @@ const AdminProductForm = () => {
       const confirmUpdate = window.confirm("¿Deseas actualizar este producto?");
       if (!confirmUpdate) return;
 
-      await axios.put(
-        `https://rubiseduction.shop:4000/api/productos/${form.id}`,
-        {
-          descripcion: form.descripcion,
-          talla: form.talla,
-          colores: form.colores,
-          precio: form.precio,
-          fotos: form.fotos,
-          codigo: form.codigo,
-        }
-      );
+      // Usamos form.id (que almacena _id) en la URL
+      await axios.put(`https://rubiseduction.shop:4000/api/productos/${form.id}`, {
+        descripcion: form.descripcion,
+        talla: form.talla,
+        colores: form.colores,
+        precio: form.precio,
+        fotos: form.fotos,
+        codigo: form.codigo,
+      });
 
       alert("Producto actualizado exitosamente.");
       resetForm();
@@ -133,12 +129,12 @@ const AdminProductForm = () => {
   /**
    * Eliminar producto
    */
-  const handleDelete = async (id) => {
+  const handleDelete = async (mongoId) => {
     try {
       const confirmDelete = window.confirm("¿Deseas eliminar este producto?");
       if (!confirmDelete) return;
 
-      await axios.delete(`https://rubiseduction.shop:4000/api/productos/${id}`);
+      await axios.delete(`https://rubiseduction.shop:4000/api/productos/${mongoId}`);
       alert("Producto eliminado exitosamente.");
       fetchProductos();
     } catch (error) {
@@ -166,9 +162,10 @@ const AdminProductForm = () => {
     <div className="admin-container">
       <h2>Administrar Productos</h2>
 
+      {/* Formulario */}
       <form onSubmit={handleCreate} className="admin-form">
         <div className="form-group">
-          <label>Codigo:</label>
+          <label>Código:</label>
           <input
             type="text"
             name="codigo"
@@ -226,7 +223,7 @@ const AdminProductForm = () => {
           />
         </div>
 
-        {/* Previsualizar fotos seleccionadas */}
+        {/* Previsualizar fotos */}
         {form.fotos.length > 0 && (
           <div className="preview-container">
             {form.fotos.map((foto, idx) => (
@@ -241,31 +238,33 @@ const AdminProductForm = () => {
         )}
 
         <div className="form-actions">
-          <button type="submit" className="btn-primary">
-            Crear Producto
-          </button>
-          {form.id && (
-            <button
-              type="button"
-              onClick={handleUpdate}
-              className="btn-secondary"
-            >
-              Actualizar Producto
+          {!form.id ? (
+            <button type="submit" className="btn-primary">
+              Crear Producto
             </button>
-          )}
-          {form.id && (
-            <button type="button" onClick={resetForm} className="btn-reset">
-              Cancelar
-            </button>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={handleUpdate}
+                className="btn-secondary"
+              >
+                Actualizar Producto
+              </button>
+              <button type="button" onClick={resetForm} className="btn-reset">
+                Cancelar
+              </button>
+            </>
           )}
         </div>
       </form>
 
+      {/* Tabla */}
       <table className="admin-table">
         <thead>
           <tr>
-            <th>ID</th>
-            <th>codigo</th>
+            <th>_id</th>
+            <th>Código</th>
             <th>Descripción</th>
             <th>Talla</th>
             <th>Colores</th>
@@ -276,8 +275,8 @@ const AdminProductForm = () => {
         </thead>
         <tbody>
           {productos.map((prod) => (
-            <tr key={prod.id}>
-              <td>{prod.id}</td>
+            <tr key={prod._id}>
+              <td>{prod._id}</td>
               <td>{prod.codigo}</td>
               <td>{prod.descripcion}</td>
               <td>{prod.talla}</td>
@@ -302,7 +301,7 @@ const AdminProductForm = () => {
                   Editar
                 </button>
                 <button
-                  onClick={() => handleDelete(prod.id)}
+                  onClick={() => handleDelete(prod._id)}
                   className="btn-delete"
                 >
                   Eliminar

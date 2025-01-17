@@ -20,12 +20,12 @@ const OrderForm = () => {
 
   const handleAddToOrder = (prod) => {
     // Ver si ya existe en el pedido
-    const existente = pedidoProductos.find((p) => p.id === prod.id);
+    const existente = pedidoProductos.find((p) => p._id === prod._id);
     if (existente) {
       // Incrementar la cantidad
       setPedidoProductos(
         pedidoProductos.map((p) =>
-          p.id === prod.id ? { ...p, cantidad: p.cantidad + 1 } : p
+          p._id === prod._id ? { ...p, cantidad: p.cantidad + 1 } : p
         )
       );
     } else {
@@ -37,7 +37,7 @@ const OrderForm = () => {
   const handleCreateOrder = async () => {
     // Preparar array para enviar al backend
     const productosPedido = pedidoProductos.map((p) => ({
-      id: p.id,
+      id: p._id, // Aquí enviamos _id en lugar de id
       cantidad: p.cantidad,
     }));
 
@@ -48,6 +48,7 @@ const OrderForm = () => {
       alert(
         `Pedido creado con ID: ${res.data.pedidoId}. Total: $${res.data.total}`
       );
+      // Limpiar el pedido
       setPedidoProductos([]);
     } catch (error) {
       console.error(error);
@@ -62,7 +63,7 @@ const OrderForm = () => {
         <div>
           <h3>Productos Disponibles</h3>
           {productos.map((prod) => (
-            <div key={prod.id} style={{ marginBottom: "0.5rem" }}>
+            <div key={prod._id} style={{ marginBottom: "0.5rem" }}>
               <span>
                 {prod.descripcion} (${prod.precio})
               </span>
@@ -83,14 +84,14 @@ const OrderForm = () => {
           ) : (
             <ul>
               {pedidoProductos.map((p) => (
-                <li key={p.id}>
+                <li key={p._id}>
                   {p.descripcion} (Cantidad: {p.cantidad})
                 </li>
               ))}
             </ul>
           )}
           <button
-            onClick={handleCreateOrder}
+            // onClick={handleCreateOrder}
             disabled={pedidoProductos.length === 0}
           >
             Confirmar Pedido

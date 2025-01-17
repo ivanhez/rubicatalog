@@ -4,7 +4,7 @@ import axios from "axios";
 const InventoryPage = () => {
   const [inventory, setInventory] = useState([]); // lista de registros
   const [form, setForm] = useState({
-    id: "",
+    _id: "",
     descripcion: "",
     color: "",
     talla: "",
@@ -36,7 +36,6 @@ const InventoryPage = () => {
   const handleCreate = async (e) => {
     e.preventDefault();
     try {
-      // Confirmar
       const confirmCreate = window.confirm(
         "¿Crear este registro de inventario?"
       );
@@ -61,8 +60,9 @@ const InventoryPage = () => {
 
   /** 4. Seleccionar registro para editar */
   const handleSelect = (item) => {
+    // Usamos _id en lugar de id
     setForm({
-      id: item.id.toString(),
+      _id: item._id, // <-- Guardamos la referencia de Mongo
       descripcion: item.descripcion,
       color: item.color,
       talla: item.talla,
@@ -79,7 +79,8 @@ const InventoryPage = () => {
       const confirmUpdate = window.confirm("¿Actualizar este registro?");
       if (!confirmUpdate) return;
 
-      await axios.put(`https://rubiseduction.shop:4000/api/inventario/${form.id}`, {
+      // Usamos _id en la URL
+      await axios.put(`https://rubiseduction.shop:4000/api/inventario/${form._id}`, {
         descripcion: form.descripcion,
         color: form.color,
         talla: form.talla,
@@ -97,12 +98,13 @@ const InventoryPage = () => {
   };
 
   /** 6. Eliminar un registro */
-  const handleDelete = async (id) => {
+  const handleDelete = async (_id) => {
     try {
       const confirmDelete = window.confirm("¿Eliminar este registro?");
       if (!confirmDelete) return;
 
-      await axios.delete(`https://rubiseduction.shop:4000/api/inventario/${id}`);
+      // De nuevo, usamos _id
+      await axios.delete(`https://rubiseduction.shop:4000/api/inventario/${_id}`);
       alert("Registro eliminado.");
       fetchInventory();
     } catch (err) {
@@ -114,7 +116,7 @@ const InventoryPage = () => {
   /** 7. Resetear formulario */
   const resetForm = () => {
     setForm({
-      id: "",
+      _id: "",
       descripcion: "",
       color: "",
       talla: "",
@@ -181,8 +183,8 @@ const InventoryPage = () => {
         </div>
 
         <div className="form-actions">
-          {/* Si form.id está vacío => crear, si no => actualizar */}
-          {!form.id ? (
+          {/* Si form._id está vacío => crear, si no => actualizar */}
+          {!form._id ? (
             <button type="submit" className="btn btn-primary">
               Crear
             </button>
@@ -211,7 +213,7 @@ const InventoryPage = () => {
       <table className="inventory-table">
         <thead>
           <tr>
-            <th>ID</th>
+            <th>_ID</th>
             <th>Descripción</th>
             <th>Color</th>
             <th>Talla</th>
@@ -222,8 +224,8 @@ const InventoryPage = () => {
         </thead>
         <tbody>
           {inventory.map((item) => (
-            <tr key={item.id}>
-              <td>{item.id}</td>
+            <tr key={item._id}>
+              <td>{item._id}</td>
               <td>{item.descripcion}</td>
               <td>{item.color}</td>
               <td>{item.talla}</td>
@@ -231,7 +233,7 @@ const InventoryPage = () => {
               <td>{item.codigo}</td>
               <td>
                 <button onClick={() => handleSelect(item)}>Editar</button>
-                <button onClick={() => handleDelete(item.id)}>Eliminar</button>
+                <button onClick={() => handleDelete(item._id)}>Eliminar</button>
               </td>
             </tr>
           ))}

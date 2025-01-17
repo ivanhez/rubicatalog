@@ -1,18 +1,14 @@
-import { pool } from "../config/db.js";
+// controllers/productController.js
+import { Product } from "../models/Product.js";
 
 /**
  * Obtener todos los productos
  */
 export const getAllProducts = async (req, res) => {
   try {
-    const [rows] = await pool.query("SELECT * FROM productos");
-    // 'fotos' viene almacenado como string JSON, debemos parsearlo antes de enviarlo al frontend (opcional)
-    const productos = rows.map((row) => {
-      return {
-        ...row,
-        fotos: row.fotos ? JSON.parse(row.fotos) : [], // Parse JSON
-      };
-    });
+    // Encuentra todos los documentos de 'Product'
+    const productos = await Product.find();
+    // No necesitas parsear 'fotos': ya es un array en el schema
     res.json(productos);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -25,15 +21,11 @@ export const getAllProducts = async (req, res) => {
 export const getProductById = async (req, res) => {
   try {
     const { id } = req.params;
-    const [rows] = await pool.query("SELECT * FROM productos WHERE id = ?", [
-      id,
-    ]);
-    if (rows.length === 0) {
+    // Buscar por _id
+    const product = await Product.findById(id);
+    if (!product) {
       return res.status(404).json({ message: "Producto no encontrado" });
     }
-    const product = rows[0];
-    // Parsear fotos
-    product.fotos = product.fotos ? JSON.parse(product.fotos) : [];
     res.json(product);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -46,23 +38,21 @@ export const getProductById = async (req, res) => {
 export const createProduct = async (req, res) => {
   try {
     const { descripcion, talla, colores, precio, fotos } = req.body;
-    /*
-      fotos => array de strings base64
-      Ejemplo: ["BASE64_1", "BASE64_2", ...]
-    */
-    const fotosJSON = JSON.stringify(fotos || []);
-    const [result] = await pool.query(
-      "INSERT INTO productos (descripcion, talla, colores, precio, fotos) VALUES (?, ?, ?, ?, ?)",
-      [descripcion, talla, colores, precio, fotosJSON]
-    );
-    res.json({
-      id: result.insertId,
+    // fotos => array de strings base64
+    // Ejemplo: ["BASE64_1", "BASE64_2", ...]
+
+    // Creamos un nuevo documento Mongoose
+    const newProduct = new Product({
       descripcion,
       talla,
       colores,
       precio,
-      fotos,
+      fotos: fotos || [],
     });
+
+    // Guardar en MongoDB
+    const savedProduct = await newProduct.save();
+    res.json(savedProduct);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -75,15 +65,24 @@ export const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
     const { descripcion, talla, colores, precio, fotos } = req.body;
-    const fotosJSON = JSON.stringify(fotos || []);
-    const [result] = await pool.query(
-      "UPDATE productos SET descripcion=?, talla=?, colores=?, precio=?, fotos=? WHERE id=?",
-      [descripcion, talla, colores, precio, fotosJSON, id]
+
+    // findByIdAndUpdate => busca y actualiza
+    const updated = await Product.findByIdAndUpdate(
+      id,
+      {
+        descripcion,
+        talla,
+        colores,
+        precio,
+        fotos: fotos || [],
+      },
+      { new: true } // retorna el doc actualizado
     );
-    if (result.affectedRows === 0) {
+
+    if (!updated) {
       return res.status(404).json({ message: "Producto no encontrado" });
     }
-    res.json({ message: "Producto actualizado correctamente" });
+    res.json({ message: "Producto actualizado correctamente", updated });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -95,13 +94,39 @@ export const updateProduct = async (req, res) => {
 export const deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const [result] = await pool.query("DELETE FROM productos WHERE id = ?", [
-      id,
-    ]);
-    if (result.affectedRows === 0) {
+    const removed = await Product.findByIdAndDelete(id);
+    if (!removed) {
       return res.status(404).json({ message: "Producto no encontrado" });
     }
     res.json({ message: "Producto eliminado correctamente" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// productController.js (Mongoose / MongoDB ejemplo)
+export const getAllProductsPaginated = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 8;
+
+    // Contar total de documentos
+    const totalDocs = await Product.countDocuments();
+
+    // Encontrar productos con skip/limit
+    const productos = await Product.find()
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    // Calcular total de páginas
+    const totalPages = Math.ceil(totalDocs / limit);
+
+    res.json({
+      productos,
+      totalDocs,
+      totalPages,
+      currentPage: page,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

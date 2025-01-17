@@ -53,7 +53,7 @@ const ProductDetail = ({ productId, onAddToCart, goBack }) => {
   // Función para traer combos según el código
   const fetchCombos = async (codigo) => {
     try {
-      // Ejemplo: GET /api/inventario/codigo/{codigo} => retorna array de combos
+      // Ejemplo: GET /api/inventario/codigo/{codigo}
       const res = await axios.get(
         `https://rubiseduction.shop:4000/api/inventario/codigo/${codigo}`
       );
@@ -70,8 +70,6 @@ const ProductDetail = ({ productId, onAddToCart, goBack }) => {
   const fotos = producto.fotos || [];
 
   // 3. Calcular tallas y colores disponibles en base a availableCombos
-
-  // Si hay color seleccionado, filtra combos para ese color; si no, todos.
   const tallasDisponibles = [
     ...new Set(
       availableCombos
@@ -82,9 +80,8 @@ const ProductDetail = ({ productId, onAddToCart, goBack }) => {
         )
         .map((c) => c.talla)
     ),
-  ].sort(); // Ordenar alfabéticamente
+  ].sort();
 
-  // Si hay talla seleccionada, filtra combos para esa talla; si no, todos.
   const coloresDisponibles = [
     ...new Set(
       availableCombos
@@ -95,12 +92,13 @@ const ProductDetail = ({ productId, onAddToCart, goBack }) => {
         )
         .map((c) => c.color)
     ),
-  ].sort(); // Ordenar alfabéticamente
+  ].sort();
 
   // Carrusel
   const handlePrev = () => {
     setCurrentSlide((prev) => (prev === 0 ? fotos.length - 1 : prev - 1));
   };
+
   const handleNext = () => {
     setCurrentSlide((prev) => (prev === fotos.length - 1 ? 0 : prev + 1));
   };
@@ -109,9 +107,7 @@ const ProductDetail = ({ productId, onAddToCart, goBack }) => {
   const handleCloseModal = () => setShowModal(false);
 
   // 4. Funciones para (des)seleccionar talla y color
-
   const handleSelectSize = (talla) => {
-    // Si está seleccionada la misma talla, la deseleccionamos poniéndola en ""
     if (selectedSize === talla) {
       setSelectedSize("");
     } else {
@@ -120,7 +116,6 @@ const ProductDetail = ({ productId, onAddToCart, goBack }) => {
   };
 
   const handleSelectColor = (color) => {
-    // Si está seleccionado el mismo color, deseleccionamos
     if (selectedColor === color) {
       setSelectedColor("");
     } else {
@@ -149,8 +144,9 @@ const ProductDetail = ({ productId, onAddToCart, goBack }) => {
       return;
     }
 
+    // Aquí usamos _id en lugar de id
     const itemToAdd = {
-      id: producto.id,
+      _id: producto._id, // <- USAMOS _id
       descripcion: producto.descripcion,
       precio: producto.precio,
       cantidad: Number(quantity),
@@ -167,7 +163,6 @@ const ProductDetail = ({ productId, onAddToCart, goBack }) => {
       </button>
 
       <div className="product-detail__content">
-        {/* Carrusel */}
         <div className="carousel-infinite">
           {fotos.length > 0 ? (
             <>
@@ -184,7 +179,6 @@ const ProductDetail = ({ productId, onAddToCart, goBack }) => {
                 {">"}
               </button>
 
-              {/* Thumbnails */}
               {fotos.length > 1 && (
                 <div className="thumbnail-list">
                   {fotos.map((foto, i) => (
