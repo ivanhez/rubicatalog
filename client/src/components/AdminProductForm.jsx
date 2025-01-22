@@ -28,7 +28,7 @@ const AdminProductForm = () => {
       const res = await axios.get(
         `https://rubiseduction.shop:4000/api/productos?page=${page}&limit=${ITEMS_PER_PAGE}`
       );
-      // Estructura esperada: { productos, totalPages, etc. }
+      // Estructura esperada: { productos, totalPages }
       setProductos(res.data.productos);
       setTotalPages(res.data.totalPages);
     } catch (error) {
@@ -59,7 +59,10 @@ const AdminProductForm = () => {
 
     Promise.all(promises)
       .then((base64Images) => {
-        setForm({ ...form, fotos: [...form.fotos, ...base64Images] });
+        setForm((prev) => ({
+          ...prev,
+          fotos: [...prev.fotos, ...base64Images],
+        }));
       })
       .catch((err) => console.error(err));
   };
@@ -93,7 +96,7 @@ const AdminProductForm = () => {
   /** Seleccionar producto para edición */
   const handleSelectProduct = (prod) => {
     setForm({
-      id: prod._id, // guardamos _id
+      id: prod._id,
       descripcion: prod.descripcion,
       talla: prod.talla,
       colores: prod.colores,
@@ -234,7 +237,6 @@ const AdminProductForm = () => {
           />
         </div>
 
-        {/* Previsualizar fotos */}
         {form.fotos.length > 0 && (
           <div className="preview-container">
             {form.fotos.map((foto, idx) => (
@@ -270,57 +272,58 @@ const AdminProductForm = () => {
         </div>
       </form>
 
-      {/* Tabla */}
-      <table className="admin-table">
-        <thead>
-          <tr>
-            {/* Quitamos columna _id */}
-            <th>Código</th>
-            <th>Descripción</th>
-            <th>Talla</th>
-            <th>Colores</th>
-            <th>Precio</th>
-            <th>Imágenes</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {productos.map((prod) => (
-            <tr key={prod._id}>
-              <td>{prod.codigo}</td>
-              <td>{prod.descripcion}</td>
-              <td>{prod.talla}</td>
-              <td>{prod.colores}</td>
-              <td>{prod.precio}</td>
-              <td>
-                {Array.isArray(prod.fotos) && prod.fotos.length > 0 ? (
-                  prod.fotos.map((foto, idx) => (
-                    <img
-                      key={idx}
-                      src={`data:image/jpeg;base64,${foto}`}
-                      alt="prod"
-                      className="prod-image"
-                    />
-                  ))
-                ) : (
-                  <span>Sin imágenes</span>
-                )}
-              </td>
-              <td>
-                <button onClick={() => handleSelectProduct(prod)}>
-                  Editar
-                </button>
-                <button
-                  onClick={() => handleDelete(prod._id)}
-                  className="btn-delete"
-                >
-                  Eliminar
-                </button>
-              </td>
+      {/* TABLA (envuelta en un div con scroll horizontal si es necesario) */}
+      <div className="table-responsive">
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Descripción</th>
+              <th>Talla</th>
+              <th>Colores</th>
+              <th>Precio</th>
+              <th>Imágenes</th>
+              <th>Acciones</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {productos.map((prod) => (
+              <tr key={prod._id}>
+                <td>{prod.codigo}</td>
+                <td>{prod.descripcion}</td>
+                <td>{prod.talla}</td>
+                <td>{prod.colores}</td>
+                <td>{prod.precio}</td>
+                <td>
+                  {Array.isArray(prod.fotos) && prod.fotos.length > 0 ? (
+                    prod.fotos.map((foto, idx) => (
+                      <img
+                        key={idx}
+                        src={`data:image/jpeg;base64,${foto}`}
+                        alt="prod"
+                        className="prod-image"
+                      />
+                    ))
+                  ) : (
+                    <span>Sin imágenes</span>
+                  )}
+                </td>
+                <td>
+                  <button onClick={() => handleSelectProduct(prod)}>
+                    Editar
+                  </button>
+                  <button
+                    onClick={() => handleDelete(prod._id)}
+                    className="btn-delete"
+                  >
+                    Eliminar
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {/* Paginación */}
       <div className="pagination">

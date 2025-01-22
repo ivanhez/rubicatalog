@@ -264,11 +264,11 @@ const InventoryPage = () => {
         <table className="inventory-table">
           <thead>
             <tr>
+              <th onClick={() => handleSort("codigo")}>Código</th>
               <th onClick={() => handleSort("descripcion")}>Descripción</th>
               <th onClick={() => handleSort("color")}>Color</th>
               <th onClick={() => handleSort("talla")}>Talla</th>
               <th onClick={() => handleSort("cantidad")}>Cantidad</th>
-              <th onClick={() => handleSort("codigo")}>Código</th>
               <th>Acciones</th>
             </tr>
           </thead>
@@ -278,6 +278,19 @@ const InventoryPage = () => {
 
               return (
                 <tr key={item._id}>
+                  <td>
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        value={item.codigo}
+                        onChange={(e) =>
+                          handleCellChange(item._id, "codigo", e.target.value)
+                        }
+                      />
+                    ) : (
+                      item.codigo
+                    )}
+                  </td>
                   <td>
                     {isEditing ? (
                       <input
@@ -334,19 +347,7 @@ const InventoryPage = () => {
                       item.cantidad
                     )}
                   </td>
-                  <td>
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        value={item.codigo}
-                        onChange={(e) =>
-                          handleCellChange(item._id, "codigo", e.target.value)
-                        }
-                      />
-                    ) : (
-                      item.codigo
-                    )}
-                  </td>
+
                   <td>
                     {isEditing ? (
                       <>
