@@ -1,4 +1,3 @@
-// App.jsx
 import React, { useState, useEffect } from "react";
 import { Routes, Route, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -10,6 +9,7 @@ import CartPage from "./pages/CartPage";
 import LoginPage from "./pages/LoginPage";
 import AdminPage from "./pages/AdminPage";
 import InventoryPage from "./pages/InventoryPage";
+
 /** Ruta protegida básica */
 function ProtectedRoute({ isAdmin, children }) {
   if (!isAdmin) {
@@ -25,12 +25,28 @@ function App() {
   const [cart, setCart] = useState([]);
   const navigate = useNavigate();
 
-  // Al montar, revisamos si hay token en localStorage
+  // Estados para responsive nav
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [navOpen, setNavOpen] = useState(false);
+
   useEffect(() => {
+    // Revisar admin token
     const token = localStorage.getItem("token");
     if (token) {
       setIsAdminLogged(true);
     }
+
+    // Listener de resize
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (!mobile) {
+        // Si la pantalla vuelve a modo escritorio, cierra el nav
+        setNavOpen(false);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   /** Login */
@@ -45,7 +61,7 @@ function App() {
       if (res.data.token) {
         localStorage.setItem("token", res.data.token);
         setIsAdminLogged(true);
-        navigate("/admin"); // Redirigir a Admin
+        navigate("/admin");
       }
     } catch (error) {
       alert("Contraseña incorrecta");
@@ -56,12 +72,14 @@ function App() {
   const handleLogout = () => {
     localStorage.removeItem("token");
     setIsAdminLogged(false);
-    navigate("/"); // Regresar al catálogo
+    navigate("/");
   };
 
   /** Agregar al carrito */
   const onAddToCart = (itemData) => {
-    // itemData => {id, descripcion, precio, talla, color, cantidad}
+    /*
+      itemData => { id, descripcion, precio, talla, color, cantidad }
+    */
     const existing = cart.find(
       (p) =>
         p._id === itemData.id &&
@@ -69,7 +87,6 @@ function App() {
         p.color === itemData.color
     );
     if (existing) {
-      // Aumentar cantidad
       setCart(
         cart.map((p) =>
           p === existing
@@ -83,57 +100,101 @@ function App() {
     navigate("/carrito");
   };
 
+  // Toggle nav en móvil
+  const toggleNav = () => {
+    setNavOpen(!navOpen);
+  };
+
+  // Función para navegar y cerrar menú en móvil
+  const handleNavClick = (path) => {
+    navigate(path);
+    setNavOpen(false);
+  };
+
   return (
     <div className="container">
       {/* HEADER */}
       <header className="header">
-        {/* Al hacer click en el título, te lleva al home (catálogo) */}
-        <h1 style={{ cursor: "pointer" }} onClick={() => navigate("/")}>
+        <h1 className="header__logo" onClick={() => navigate("/")}>
           Rubi Seduction
         </h1>
 
-        {/* Barra de navegación */}
-        <nav className="nav">
-          <button onClick={() => navigate("/")}>Catálogo</button>
-          <button onClick={() => navigate("/carrito")}>
-            Carrito ({cart.length})
+        {!isMobile ? (
+          /* Nav escritorio */
+          <nav className="nav-desktop">
+            <button onClick={() => navigate("/")}>Catálogo</button>
+            <button onClick={() => navigate("/carrito")}>
+              Carrito ({cart.length})
+            </button>
+            {isAdminLogged && (
+              <>
+                <button onClick={() => navigate("/admin")}>Productos</button>
+                <button onClick={() => navigate("/inventario")}>
+                  Inventario
+                </button>
+                <button onClick={handleLogout}>Cerrar Sesión</button>
+              </>
+            )}
+          </nav>
+        ) : (
+          /* Botón hamburger en móvil */
+          <button className="hamburger" onClick={toggleNav}>
+            ☰
           </button>
-          {!isAdminLogged ? (
-            // <button onClick={() => navigate("/login")}>Admin Login</button>
-            <></>
-          ) : (
-            <>
-              <button onClick={() => navigate("/admin")}>Productos</button>
-              <button onClick={() => navigate("/inventario")}>
-                Inventario
-              </button>
-              <button onClick={handleLogout}>Cerrar Sesión</button>
-            </>
-          )}
-        </nav>
+        )}
       </header>
 
-      {/* DEFINICIÓN DE RUTAS */}
-      <Routes>
-        {/* Ruta principal (catálogo) */}
-        <Route path="/" element={<CatalogPage onAddToCart={onAddToCart} />} />
+      {/* Sidebar overlay para móvil */}
+      {isMobile && navOpen && (
+        <div className="overlay" onClick={toggleNav}>
+          <div className="sidebar" onClick={(e) => e.stopPropagation()}>
+            <button className="close-btn" onClick={toggleNav}>
+              ✕
+            </button>
+            <nav className="nav-mobile">
+              <div>
+                {" "}
+                <button onClick={() => handleNavClick("/")}>Catálogo</button>
+              </div>
+              <div>
+                <button onClick={() => handleNavClick("/carrito")}>
+                  Carrito ({cart.length})
+                </button>
+              </div>
+              {isAdminLogged && (
+                <>
+                  <div>
+                    <button onClick={() => handleNavClick("/admin")}>
+                      Productos
+                    </button>
+                  </div>
+                  <div>
+                    <button onClick={() => handleNavClick("/inventario")}>
+                      Inventario
+                    </button>
+                  </div>
+                  <div>
+                    {" "}
+                    <button onClick={handleLogout}>Cerrar Sesión</button>
+                  </div>
+                </>
+              )}
+            </nav>
+          </div>
+        </div>
+      )}
 
-        {/* Detalle de producto */}
+      <Routes>
+        <Route path="/" element={<CatalogPage onAddToCart={onAddToCart} />} />
         <Route
           path="/detalle/:id"
           element={<DetailPage onAddToCart={onAddToCart} />}
         />
-
-        {/* Carrito */}
         <Route
           path="/carrito"
           element={<CartPage cart={cart} setCart={setCart} />}
         />
-
-        {/* Login */}
         <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
-
-        {/* Admin (ruta protegida) */}
         <Route
           path="/admin"
           element={
@@ -146,12 +207,10 @@ function App() {
           path="/inventario"
           element={
             <ProtectedRoute isAdmin={isAdminLogged}>
-              <InventoryPage></InventoryPage>
+              <InventoryPage />
             </ProtectedRoute>
           }
         />
-
-        {/* Cualquier otra ruta: se redirige a / (opcional) */}
         <Route
           path="*"
           element={
