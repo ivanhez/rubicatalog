@@ -2048,3 +2048,27 @@ footer {
     color: #666;
   }
 }
+.tallas-container,
+.colores-container {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.talla-button,
+.color-button {
+  background-color: #444;
+  color: #fff;
+  border: none;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.talla-button:hover,
+.color-button:hover {
+  background-color: #666;
+}

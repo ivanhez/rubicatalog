@@ -64,6 +64,10 @@ const ProductList = () => {
           {/* Grid de productos */}
           <div className="catalog-grid">
             {productos.map((prod) => {
+              // Convertir la cadena 'talla' y 'colores' en arrays (si existen)
+              const tallas = prod.talla ? prod.talla.split(",") : [];
+              const colores = prod.colores ? prod.colores.split(",") : [];
+
               return (
                 <div
                   key={prod._id}
@@ -81,11 +85,53 @@ const ProductList = () => {
                     loading="lazy"
                     decoding="async"
                   />
-
                   <h3 className="product-title">
                     {titleCase(prod.descripcion)}
                   </h3>
                   <p className="product-price">Q{prod.precio}</p>
+
+                  {/* Mostrar tallas como botones */}
+                  {tallas.length > 0 && (
+                    <div className="tallas-container">
+                      {tallas.map((talla) => {
+                        const trimmed = talla.trim();
+                        return (
+                          <button
+                            key={trimmed}
+                            className="talla-button"
+                            onClick={(e) => {
+                              // Evitar que se dispare handleSelectProduct si el user hace click en la talla
+                              e.stopPropagation();
+                              console.log("Talla clicked: ", trimmed);
+                            }}
+                          >
+                            {trimmed}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* Mostrar colores como botones */}
+                  {colores.length > 0 && (
+                    <div className="colores-container">
+                      {colores.map((color) => {
+                        const trimmed = color.trim();
+                        return (
+                          <button
+                            key={trimmed}
+                            className="color-button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              console.log("Color clicked: ", trimmed);
+                            }}
+                          >
+                            {trimmed}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               );
             })}
