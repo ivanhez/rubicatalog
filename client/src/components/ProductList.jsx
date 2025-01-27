@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -8,8 +8,11 @@ const ProductList = () => {
   const [productos, setProductos] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
-
   const [isLoading, setIsLoading] = useState(true);
+
+  // Aquí guardamos combos de inventario por código:
+  // combosMap = { "BAO1": [ {color, talla, cantidad}, ... ], "BAS1": [ ... ] }
+  const [combosMap, setCombosMap] = useState({});
 
   const navigate = useNavigate();
 
@@ -17,7 +20,7 @@ const ProductList = () => {
     fetchProductos(currentPage);
   }, [currentPage]);
 
-  // Petición al backend con page & limit
+  // 1. Obtener productos con page/limit
   const fetchProductos = async (page) => {
     try {
       setIsLoading(true);
@@ -29,10 +32,40 @@ const ProductList = () => {
     } catch (error) {
       console.error(error);
     } finally {
-      // Terminamos la carga
       setIsLoading(false);
-      // Regresar al tope con suavidad
       window.scrollTo({ top: 550, behavior: "smooth" });
+    }
+  };
+
+  // 2. Para cada producto, si tiene .codigo, obtener combos del inventario (si no está en combosMap)
+  useEffect(() => {
+    // Recolectar códigos de productos
+    const codigos = [
+      ...new Set(productos.map((p) => p.codigo).filter(Boolean)),
+    ];
+
+    // Para cada código, si combosMap no lo tiene, hacemos fetch
+    codigos.forEach((code) => {
+      if (!combosMap[code]) {
+        fetchInventarioPorCodigo(code);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [productos]);
+
+  // 3. Función para obtener combos de inventario por codigo
+  const fetchInventarioPorCodigo = async (codigo) => {
+    try {
+      const res = await axios.get(
+        `https://rubiseduction.shop:4000/api/inventario/codigo/${codigo}`
+      );
+      // res.data => array de combos ( { descripcion, color, talla, cantidad, codigo } )
+      setCombosMap((prev) => ({
+        ...prev,
+        [codigo]: res.data,
+      }));
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -40,15 +73,7 @@ const ProductList = () => {
     navigate(`/detalle/${_id}`);
   };
 
-  const titleCase = (str) => {
-    return str
-      .toLowerCase()
-      .split(" ")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
-  };
-
-  // Cambio de página
+  // Lógica de paginación local
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
@@ -61,12 +86,20 @@ const ProductList = () => {
         </div>
       ) : (
         <>
-          {/* Grid de productos */}
           <div className="catalog-grid">
             {productos.map((prod) => {
-              // Convertir la cadena 'talla' y 'colores' en arrays (si existen)
-              const tallas = prod.talla ? prod.talla.split(",") : [];
-              const colores = prod.colores ? prod.colores.split(",") : [];
+              // combosMap[prod.codigo] => array de { color, talla, cantidad, ... }
+              const combos = combosMap[prod.codigo] || [];
+
+              // Sacar todas las tallas únicas
+              const tallas = [
+                ...new Set(combos.map((c) => c.talla?.trim() || "")),
+              ].filter((x) => x !== "");
+
+              // Sacar todos los colores únicos
+              const colores = [
+                ...new Set(combos.map((c) => c.color?.trim() || "")),
+              ].filter((x) => x !== "");
 
               return (
                 <div
@@ -85,51 +118,36 @@ const ProductList = () => {
                     loading="lazy"
                     decoding="async"
                   />
-                  <h3 className="product-title">
-                    {titleCase(prod.descripcion)}
-                  </h3>
+                  <h3 className="product-title">{prod.descripcion}</h3>
                   <p className="product-price">Q{prod.precio}</p>
 
-                  {/* Mostrar tallas como botones */}
+                  {/* Mostrar tallas como botones, sacadas de combos de inventario */}
                   {tallas.length > 0 && (
                     <div className="tallas-container">
-                      {tallas.map((talla) => {
-                        const trimmed = talla.trim();
-                        return (
-                          <button
-                            key={trimmed}
-                            className="talla-button"
-                            onClick={(e) => {
-                              // Evitar que se dispare handleSelectProduct si el user hace click en la talla
-                              e.stopPropagation();
-                              console.log("Talla clicked: ", trimmed);
-                            }}
-                          >
-                            {trimmed}
-                          </button>
-                        );
-                      })}
+                      {tallas.map((talla) => (
+                        <button
+                          key={talla}
+                          className="talla-button"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {talla}
+                        </button>
+                      ))}
                     </div>
                   )}
 
                   {/* Mostrar colores como botones */}
                   {colores.length > 0 && (
                     <div className="colores-container">
-                      {colores.map((color) => {
-                        const trimmed = color.trim();
-                        return (
-                          <button
-                            key={trimmed}
-                            className="color-button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              console.log("Color clicked: ", trimmed);
-                            }}
-                          >
-                            {trimmed}
-                          </button>
-                        );
-                      })}
+                      {colores.map((color) => (
+                        <button
+                          key={color}
+                          className="color-button"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {color}
+                        </button>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -147,7 +165,6 @@ const ProductList = () => {
               >
                 ←
               </button>
-
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(
                 (page) => (
                   <button
@@ -161,7 +178,6 @@ const ProductList = () => {
                   </button>
                 )
               )}
-
               <button
                 className="page-button"
                 onClick={() => handlePageChange(currentPage + 1)}
