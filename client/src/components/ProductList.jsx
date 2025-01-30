@@ -10,8 +10,6 @@ const ProductList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Aquí guardamos combos de inventario por código:
-  // combosMap = { "BAO1": [ {color, talla, cantidad}, ... ], "BAS1": [ ... ] }
   const [combosMap, setCombosMap] = useState({});
 
   const navigate = useNavigate();
@@ -20,7 +18,6 @@ const ProductList = () => {
     fetchProductos(currentPage);
   }, [currentPage]);
 
-  // 1. Obtener productos con page/limit
   const fetchProductos = async (page) => {
     try {
       setIsLoading(true);
@@ -37,14 +34,11 @@ const ProductList = () => {
     }
   };
 
-  // 2. Para cada producto, si tiene .codigo, obtener combos del inventario (si no está en combosMap)
   useEffect(() => {
-    // Recolectar códigos de productos
     const codigos = [
       ...new Set(productos.map((p) => p.codigo).filter(Boolean)),
     ];
 
-    // Para cada código, si combosMap no lo tiene, hacemos fetch
     codigos.forEach((code) => {
       if (!combosMap[code]) {
         fetchInventarioPorCodigo(code);
@@ -53,13 +47,11 @@ const ProductList = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productos]);
 
-  // 3. Función para obtener combos de inventario por codigo
   const fetchInventarioPorCodigo = async (codigo) => {
     try {
       const res = await axios.get(
         `https://rubiseduction.shop:4000/api/inventario/codigo/${codigo}`
       );
-      // res.data => array de combos ( { descripcion, color, talla, cantidad, codigo } )
       setCombosMap((prev) => ({
         ...prev,
         [codigo]: res.data,
@@ -73,30 +65,41 @@ const ProductList = () => {
     navigate(`/detalle/${_id}`);
   };
 
-  // Lógica de paginación local
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
 
+  // Placeholder card component
+  const PlaceholderCard = () => (
+    <div className="product-card placeholder">
+      <div className="product-image placeholder"></div>
+      <h3 className="product-title placeholder"></h3>
+      <p className="product-price placeholder"></p>
+      <div className="tallas-container">
+        {[...Array(3)].map((_, i) => (
+          <button key={i} className="talla-button placeholder"></button>
+        ))}
+      </div>
+      <div className="colores-container">
+        {[...Array(3)].map((_, i) => (
+          <button key={i} className="color-button placeholder"></button>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
     <div>
-      {isLoading ? (
-        <div style={{ textAlign: "center", margin: "2rem 0" }}>
-          <p>Cargando productos...</p>
-        </div>
-      ) : (
-        <>
-          <div className="catalog-grid">
-            {productos.map((prod) => {
-              // combosMap[prod.codigo] => array de { color, talla, cantidad, ... }
+      <div className="catalog-grid">
+        {isLoading
+          ? [...Array(ITEMS_PER_PAGE)].map((_, i) => (
+              <PlaceholderCard key={i} />
+            ))
+          : productos.map((prod) => {
               const combos = combosMap[prod.codigo] || [];
-
-              // Sacar todas las tallas únicas
               const tallas = [
                 ...new Set(combos.map((c) => c.talla?.trim() || "")),
               ].filter((x) => x !== "");
-
-              // Sacar todos los colores únicos
               const colores = [
                 ...new Set(combos.map((c) => c.color?.trim() || "")),
               ].filter((x) => x !== "");
@@ -121,7 +124,6 @@ const ProductList = () => {
                   <h3 className="product-title">{prod.descripcion}</h3>
                   <p className="product-price">Q{prod.precio}</p>
 
-                  {/* Mostrar tallas como botones, sacadas de combos de inventario */}
                   {tallas.length > 0 && (
                     <div className="tallas-container">
                       {tallas.map((talla) => (
@@ -136,7 +138,6 @@ const ProductList = () => {
                     </div>
                   )}
 
-                  {/* Mostrar colores como botones */}
                   {colores.length > 0 && (
                     <div className="colores-container">
                       {colores.map((color) => (
@@ -153,41 +154,34 @@ const ProductList = () => {
                 </div>
               );
             })}
-          </div>
+      </div>
 
-          {/* Paginación */}
-          {totalPages > 1 && (
-            <div className="pagination">
-              <button
-                className="page-button"
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-              >
-                ←
-              </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (page) => (
-                  <button
-                    key={page}
-                    className={`page-button ${
-                      page === currentPage ? "active" : ""
-                    }`}
-                    onClick={() => handlePageChange(page)}
-                  >
-                    {page}
-                  </button>
-                )
-              )}
-              <button
-                className="page-button"
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-              >
-                →
-              </button>
-            </div>
-          )}
-        </>
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button
+            className="page-button"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            ←
+          </button>
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+            <button
+              key={page}
+              className={`page-button ${page === currentPage ? "active" : ""}`}
+              onClick={() => handlePageChange(page)}
+            >
+              {page}
+            </button>
+          ))}
+          <button
+            className="page-button"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            →
+          </button>
+        </div>
       )}
     </div>
   );
